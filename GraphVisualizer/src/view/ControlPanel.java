@@ -4,6 +4,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -11,26 +12,57 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+
+import model.Frame;
 import model.Importer;
 import model.Model;
+import model.Point;
+import model.Timeline;
 
 
 public class ControlPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private Model m;	
 	
-	private JLabel graphLabel, layoutLabel, animLabel, blankLabel, blankLabel2;
-	private JButton newButton, sampleButton, importButton, exportButton, helpButton;
-	private JRadioButton basicLayout, treeLayout, shortAnim, stepByStepAnim;
+	private JLabel graphLabel, layoutLabel, animLabel, orderLabel;
+	private JButton newButton, sampleButton, importButton, exportButton, helpButton, consoleShowButton;
+	private JRadioButton basicLayout, treeLayout, randomLayout, chronoOrder, leftOrder, rightOrder, middleFullOrder, middleEmptyOrder; //radialLayout
 	
-
-	public ControlPanel(Model m){
-		this.m = m;
+	private Model model;
+	private GraphPanel graphPanel;
+	
+	private int layoutIndex = 2;
+	private int horizOrderIndex = 0;
+	
+	private int nodeSize = 20;
+	private int nodeVertDist = 50;
+	private int nodeMinHorizDist = 30;
+	
+	
+	public void setModel(Model model){
+		this.model = model;
+		model.setParams(layoutIndex, nodeSize, nodeVertDist, nodeMinHorizDist);
+	}
+	
+	public int getNodeSize() {
+		return nodeSize;
+	}
+	
+	public int getNodVertDist() {
+		return nodeVertDist;
+	}
+	
+	public int getHorizOrderIndex() {
+		return horizOrderIndex;
+	}
+	
+	
+	public ControlPanel(GraphPanel graphPanel){
+		this.graphPanel = graphPanel;
 		
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		
-		graphLabel = new JLabel("   Graph:   ");
+		graphLabel = new JLabel("  Graph: ");
 		add(graphLabel);
 				
 		newButton = new JButton("new");
@@ -43,7 +75,6 @@ public class ControlPanel extends JPanel {
 		});	
 		add(newButton);
 
-
 		sampleButton = new JButton("sample");
 		sampleButton.addMouseListener(new MouseAdapter() {
 			@Override
@@ -53,9 +84,6 @@ public class ControlPanel extends JPanel {
 			}
 		});	
 		add(sampleButton);
-		
-		blankLabel = new JLabel("      ");
-		add(blankLabel);
 		
 		importButton = new JButton("import");
 		importButton.addMouseListener(new MouseAdapter() {
@@ -73,7 +101,7 @@ public class ControlPanel extends JPanel {
 		
 
 		
-		layoutLabel = new JLabel("     Layout: ");
+		layoutLabel = new JLabel("    Layout: ");
 		add(layoutLabel);
 		
 		ButtonGroup layoutGroup = new ButtonGroup();
@@ -82,51 +110,100 @@ public class ControlPanel extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(basicLayout.isEnabled())
-					setBasicLayout();
+					setLayoutIndex(1);
 			}
 		});	
-		treeLayout = new JRadioButton("nice");
+		treeLayout = new JRadioButton("tree");
 		treeLayout.setSelected(true);
 		treeLayout.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(treeLayout.isEnabled())
-					setTreeLayout();
+					setLayoutIndex(2);
+			}
+		});	
+//		radialLayout = new JRadioButton("radial");
+//		radialLayout.addMouseListener(new MouseAdapter() {
+//			@Override
+//			public void mouseReleased(MouseEvent e) {
+//				if(radialLayout.isEnabled())
+//					setLayoutIndex(3);
+//			}
+//		});	
+		randomLayout = new JRadioButton("random");
+		randomLayout.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(randomLayout.isEnabled())
+					setLayoutIndex(4);
 			}
 		});	
 		layoutGroup.add(basicLayout);
 		layoutGroup.add(treeLayout);
+		//layoutGroup.add(radialLayout);
+		layoutGroup.add(randomLayout);
 		add(basicLayout);
-		add(treeLayout);		
+		add(treeLayout);
+		//add(radialLayout);
+		add(randomLayout);		
 
 		
-		animLabel = new JLabel("          Animation: ");
-		add(animLabel);
+		orderLabel = new JLabel("          Order: ");
+		add(orderLabel);
 		
-		ButtonGroup animGroup = new ButtonGroup();
-		shortAnim = new JRadioButton("short");
-		shortAnim.setSelected(true);
-		shortAnim.addMouseListener(new MouseAdapter() {
+		ButtonGroup orderGroup = new ButtonGroup();
+		chronoOrder = new JRadioButton("chronological");
+		chronoOrder.setSelected(true);
+		chronoOrder.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if(shortAnim.isEnabled())
-					setShortAnim();
+				if(chronoOrder.isEnabled())
+					setHorizOrderIndex(0);
 			}
 		});	
-		stepByStepAnim = new JRadioButton("step-by-step   ");
-		stepByStepAnim.addMouseListener(new MouseAdapter() {
+		leftOrder = new JRadioButton("left");
+		leftOrder.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if(stepByStepAnim.isEnabled())
-					setStepByStepAnim();
+				if(leftOrder.isEnabled())
+					setHorizOrderIndex(1);
 			}
 		});	
-		animGroup.add(shortAnim);
-		animGroup.add(stepByStepAnim);
-		add(shortAnim);
-		add(stepByStepAnim);
-		
-		
+		rightOrder = new JRadioButton("right");
+		rightOrder.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(rightOrder.isEnabled())
+					setHorizOrderIndex(2);
+			}
+		});	
+		middleFullOrder = new JRadioButton("middle full");
+		middleFullOrder.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(middleFullOrder.isEnabled())
+					setHorizOrderIndex(3);
+			}
+		});	
+		middleEmptyOrder = new JRadioButton("middle empty");
+		middleEmptyOrder.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(middleEmptyOrder.isEnabled())
+					setHorizOrderIndex(4);
+			}
+		});	
+		orderGroup.add(chronoOrder);
+		orderGroup.add(leftOrder);
+		orderGroup.add(rightOrder);
+		orderGroup.add(middleFullOrder);
+		orderGroup.add(middleEmptyOrder);
+		add(chronoOrder);
+		add(leftOrder);
+		add(rightOrder);
+		add(middleFullOrder);
+		add(middleEmptyOrder);
+	
 		exportButton = new JButton("export");
 		exportButton.addMouseListener(new MouseAdapter() {
 			@Override
@@ -141,8 +218,15 @@ public class ControlPanel extends JPanel {
 		});	
 		add(exportButton);
 		
-		blankLabel2 = new JLabel("      ");
-		add(blankLabel2);
+		consoleShowButton = new JButton("show data");
+		consoleShowButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(consoleShowButton.isEnabled())
+					consoleShow();
+			}
+		});	
+		add(consoleShowButton);
 
 		helpButton = new JButton("help");
 		helpButton.addMouseListener(new MouseAdapter() {
@@ -150,85 +234,89 @@ public class ControlPanel extends JPanel {
 			public void mouseReleased(MouseEvent e) {
 				if(helpButton.isEnabled())
 					JOptionPane.showMessageDialog(null, "left mouse-click:     add a child to the clicked node"
-							+ "\nright mouse-click:  delete a node & everything below it"
+							+ "\nleft mouse-click and release between nodes below:   add a child at that position between it's siblings"
+							+ "\nright mouse-click:  delete a node & everything attached to it"
 							+ "\n\nimport & export in graphml-format / e.g. yEd (freeware) uses that"
+							+ "\nin the animation mode 'nodewise' there is a first attempt to show helplines, if activated"
 							+ "\n\ncrash-causes:"
-							+ "\n- this program can only handle strict tree-structures (every node but the rootnode has exactly one parent)"
-							+ "\n   at this point - importing other kind of graphs might result in funny things"
-							+ "\n- switching to step-by-step animation if rootnode has not at least two grandchildren won't work"
-							+ "\n   as well as deletion in step-by-step mode that would create that condition"
-							+ "\n\n\nbenjaminaaron / September 2013", "help", JOptionPane.PLAIN_MESSAGE);
+							+ "\n- at this point this program can only handle strict tree-structures (every node but the rootnode has exactly one parent)"
+							+ "\n   importing other kind of graphs might result in funny things"
+							+ "\n\n\nbenjaminaaron / Version 2 / October 2013", "help", JOptionPane.PLAIN_MESSAGE);
 			}
 		});	
 		add(helpButton);
 	}
 	
 	
-	private void initNewGraph(){
-		m.initNewGraph();
+	private void consoleShow() {
+		String data = model.getGraph().consoleShow();
+		System.out.println(data);
+		JOptionPane.showMessageDialog(null, data, "graph-data", JOptionPane.PLAIN_MESSAGE);
 	}
 	
-	private void initSampleGraph(){
-		m.initSampleGraph();
+	public void initNewGraph(){
+		model.initNewGraph();
+		Frame initKeyframe = new Frame();
+		initKeyframe.addPoint(new Point("node_rootnode", 0, 0));
+		graphPanel.setTimeline(new Timeline(initKeyframe, null, null, null));
 	}
 	
-	private void setBasicLayout(){
-		m.setBasicLayout();
+	public void initSampleGraph(){
+		model.initSampleGraph();
+		graphPanel.setTimeline(model.getTimeline());
 	}
 	
-	private void setTreeLayout(){
-		m.setTreeLayout();
+	public void handleNodeClicked(String clickedNodeID, boolean leftButton){
+		model.handleNodeClicked(clickedNodeID, leftButton);
+		graphPanel.setTimeline(model.getTimeline());
 	}
 	
-	private void setShortAnim(){
-		m.setShortAnim();
+	public void handleNodeClicked(String clickedNodeID, String closestNodeToRelease, boolean rightFromThis) {
+		model.handleNodeClicked(clickedNodeID, closestNodeToRelease, rightFromThis);
+		graphPanel.setTimeline(model.getTimeline());
 	}
 	
-//	public boolean getShortAnimSelected(){
-//		return shortAnim.isSelected();
-//	}
+	private void setLayoutIndex(int index){
+		layoutIndex = index;
+		model.setLayoutIndex(index);
+		graphPanel.setTimeline(model.getTimeline());
+	}
 	
-	private void setStepByStepAnim(){	
-		//if(m.allowStepByStepAnim())
-			m.setStepByStepAnim();
-//		else{
-//			shortAnim.setSelected(true);
-//			stepByStepAnim.setSelected(false);
-//			JOptionPane.showMessageDialog(null, "can't enable step-by-step animation if rootnode doesn't have grandchildren at least", "ancestry too small", JOptionPane.PLAIN_MESSAGE);
-//		}
+	private void setHorizOrderIndex(int index){
+		horizOrderIndex = index;
+		model.setOrderIndex(index);
+		graphPanel.setTimeline(model.getTimeline());
 	}
 	
 	private void exportGraph() throws FileNotFoundException{
-		String filename = m.exportGraph();		
+		String filename = model.exportGraph();		
 		JOptionPane.showMessageDialog(null, "exported as file: \n" + filename, "export successful", JOptionPane.PLAIN_MESSAGE);
 	}
 	
-	private void importGraph() throws IOException{
-		Importer importer = new Importer();
-		if(importer.isFileReady())
-			m.loadImportedGraph(importer.convertGraphmlFileToGraph());
-	}
+	private void importGraph() throws IOException{		
+		model.loadImportedGraph(Importer.convertGraphmlFileToGraph());
+		graphPanel.setTimeline(model.getTimeline());
+	}	
 	
-	public void disableAll(){
-		enableDisable(false);
-	}
-	
-	public void enableAll(){
-		enableDisable(true);
-	}
-	
-	private void enableDisable(boolean onoff){
+	public void enableSwitch(boolean onoff){
 		graphLabel.setEnabled(onoff);
 		layoutLabel.setEnabled(onoff);
-		animLabel.setEnabled(onoff);
+		orderLabel.setEnabled(onoff);
 		newButton.setEnabled(onoff);
 		sampleButton.setEnabled(onoff);
 		importButton.setEnabled(onoff);
 		exportButton.setEnabled(onoff);
 		helpButton.setEnabled(onoff);
+		consoleShowButton.setEnabled(onoff);
 		basicLayout.setEnabled(onoff);
 		treeLayout.setEnabled(onoff);
-		shortAnim.setEnabled(onoff);
-		stepByStepAnim.setEnabled(onoff);	
+		//radialLayout.setEnabled(onoff);
+		randomLayout.setEnabled(onoff);			
+		chronoOrder.setEnabled(onoff);	
+		leftOrder.setEnabled(onoff);
+		rightOrder.setEnabled(onoff);	
+		middleFullOrder.setEnabled(onoff);	
+		middleEmptyOrder.setEnabled(onoff);
 	}
+
 }

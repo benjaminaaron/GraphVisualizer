@@ -7,21 +7,15 @@ import controller.FileChooser;
 
 public class Importer {
 	
-	private String[] graphmlFile;
-	private boolean fileReady = false;
-	
-	public Importer() throws IOException{
+	private static String[] graphmlFile;
+		
+	public static Graph convertGraphmlFileToGraph() throws IOException{
 		FileChooser fc = new FileChooser();
 		graphmlFile = fc.chooseFile();
-		if(graphmlFile != null)
-			fileReady = true;		
-	}	
-	
-	public boolean isFileReady(){
-		return fileReady;
-	}
-	
-	public Graph convertGraphmlFileToGraph(){
+		
+		for(int i = 0; i < graphmlFile.length; i++)
+			System.out.println(graphmlFile[i]);
+		
 		ArrayList<Node> nodes = new ArrayList<>();
 		ArrayList<Edge> edges  = new ArrayList<>();	
 		
@@ -29,7 +23,7 @@ public class Importer {
 		String a = String.valueOf('"');
 		String nodeID = "";
 		String nodeValue = "";	
-		String edgeID = "";
+		//String edgeID = "";
 		String edgeSourceID = "";
 		String edgeTargetID = "";		
 		
@@ -47,16 +41,19 @@ public class Importer {
 				nodes.add(new Node(nodeID, nodeValue));
 			}						
 			if(keyword.equals("edge")){
-				edgeID = s.split(a)[1];
+				//edgeID = s.split(a)[1];
 				edgeSourceID = s.split(a)[3];
 				edgeTargetID = s.split(a)[5];
-				edges.add(new Edge(edgeID, edgeSourceID, edgeTargetID));
+				edges.add(new Edge(findNodeByID(nodes, edgeSourceID), findNodeByID(nodes, edgeTargetID)));
 			}
 		}		
 		return new Graph(nodes, edges);		
 	}
 	
-	
-	
-	
+	private static Node findNodeByID(ArrayList<Node> nodes, String nodeID){
+		for(Node node : nodes)
+			if(node.getID().equals(nodeID))
+				return node;
+		return null;
+	}
 }

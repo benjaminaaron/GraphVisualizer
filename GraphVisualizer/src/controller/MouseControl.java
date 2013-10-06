@@ -8,22 +8,29 @@ import view.GraphPanel;
 
 public class MouseControl implements MouseListener{
 
-	private GraphPanel w;
+	private GraphPanel graphPanel;
+	int clickX, clickY;
 	
-	public MouseControl(GraphPanel w){
-		this.w = w;
+	public MouseControl(GraphPanel graphPanel){
+		this.graphPanel = graphPanel;
 	}
 	
 	@Override
-	public void mouseClicked(MouseEvent arg0) {}
-
+	public void mousePressed(MouseEvent arg0) {
+		clickX = arg0.getX();
+		clickY = arg0.getY();
+	}
+	
 	@Override
-	public void mouseReleased(MouseEvent arg0) {	
+	public void mouseReleased(MouseEvent arg0) {		
 		boolean leftButton = true;	
 		if(SwingUtilities.isRightMouseButton(arg0))
 			leftButton = false;	
-		w.handleMouseReleasedCoords(arg0.getX(), arg0.getY(), leftButton);
+		graphPanel.handleMouseRelease(clickX, clickY, arg0.getX(), arg0.getY(), leftButton);
 	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {}
 
 	
 	@Override
@@ -31,8 +38,4 @@ public class MouseControl implements MouseListener{
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {}
-
-	@Override
-	public void mousePressed(MouseEvent arg0) {}
-	
 }

@@ -2,32 +2,27 @@ package model;
 
 public class Edge {
 	
-	private String ID;
-	private String sourceID;
-	private String targetID;	
-
-	public Edge(String ID, String sourceID, String targetID){
-		if(ID.equals(""))
-			this.ID = "edge_" + this.hashCode();	
-		else
-			this.ID = ID;
-		this.sourceID = sourceID;
-		this.targetID = targetID;
-	}	
+	private Node source;
+	private Node target;
 	
-	public String getID(){
-		return ID;
+	public Edge(Node source, Node target){		
+		this.source = source;
+		this.target = target;
 	}
 	
-	public String getSourceID(){
-		return sourceID;
+	public Node getSource(){
+		return source;
 	}
 	
-	public String getTargetID(){
-		return targetID;
+	public Node getTarget(){
+		return target;
+	}
+	
+	public Line getLine(){
+		return new Line(source.getPoint(), target.getPoint());
 	}
 	
 	public String show() {
-		return "[" + ID + "]: [" + sourceID + "] -> [" + targetID + "]";
+		return "Edge: [" + source.getID() + "] -> [" + target.getID() + "]";
 	}
 }

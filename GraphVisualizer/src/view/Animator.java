@@ -2,26 +2,24 @@ package view;
 
 public class Animator {
 	
-	private GraphPanel w;
+	private GraphPanel graphPanel;
 
-	public Animator(GraphPanel w){
-		this.w = w;
+	public Animator(GraphPanel graphPanel){
+		this.graphPanel = graphPanel;
 	}
 	
-	public void triggerUpdating(int animSteps){		
-		
-		while(animSteps > 0){		
+	public void triggerUpdating(int animSteps){							
+		while(animSteps > 0 && graphPanel.getAnimationAllowed()){	
 			try {
 				Thread.sleep(30);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			}	
-						
-			w.updateAnimation();
-			w.repaint();
-						
-			animSteps --;
-		}			
-		w.animationFinished();		
-	}	
+			}			
+			graphPanel.updateAnimation();
+			graphPanel.repaint();
+			animSteps --;			
+		}	
+		if(animSteps == 0)
+			graphPanel.animationFinished();			
+	}
 }

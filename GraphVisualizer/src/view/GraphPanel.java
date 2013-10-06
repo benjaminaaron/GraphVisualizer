@@ -1,169 +1,198 @@
 package view;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
 import controller.MouseControl;
-import model.Edge;
-import model.Graph;
+import model.Frame;
+import model.Line;
 import model.Model;
-import model.Node;
+import model.Point;
+import model.Timeline;
+
 
 public class GraphPanel extends JPanel{
 
 	private static final long serialVersionUID = 1L;
-	private Model m;
-	private ControlPanel cp;
 	
-	private int xOffset = 450; 
+	private GraphPanel thisGraphPanel = this;
+	private ControlPanel controlPanel;
+	private AnimationPanel animationPanel;
+	
+	private int xOffset = 650; 
 	private int yOffset = 80;
 	
-	private final int nodeSize = 20;
-	private final int verticalDist = 50;
-	private final int nodeMinDist = 30;
+	private int nodeSize;
+	private int nodeVertDist;
 	
-	private Graph graphToShow;
-	
-	private Animator animate;
-		
-	private boolean animMode = true;
-	private int animSteps = 20;
+	private int animIndex;
+	private Timeline timeline;
+	private ArrayList<Frame> frames;
+	private Frame currentFrame;
+	private int animStepsBtwnKeyframes = 15;
+	private int currentAnimStep;
 	private boolean inAnimation = false;
-	private boolean inAnimSequence = false;
-	private ArrayList<Graph> animSequence;
-	private int animSeqSize;
-	private int animPos;
+	private boolean animationAllowed = true;
+	
+	private boolean showNodeID = false;
+	private boolean showHelplines = false;
 	
 	//for double buffering
 	private Image dbImage;
 	private Graphics dbg;
-	
 		
-	public GraphPanel(Model m, ControlPanel cp){			
-		this.m = m;
-		this.cp = cp;
-		m.setGraphVisuParams(nodeSize, verticalDist, nodeMinDist);	
-			
+		
+	public GraphPanel(){						
 		MouseControl mc = new MouseControl(this);
 		addMouseListener(mc);
-		
-		animate = new Animator(this);
 	}
 	
-	public void updateXoffset(){	
-		xOffset = getWidth() / 2;
+	public void setControlAndSliderPanel(ControlPanel controlPanel, AnimationPanel animationPanel) {
+		this.controlPanel = controlPanel;
+		nodeSize = controlPanel.getNodeSize();
+		nodeVertDist = controlPanel.getNodVertDist();
+			
+		this.animationPanel = animationPanel;
+		animIndex = animationPanel.getAnimIndex();
 	}
 	
-	public void setAnimMode(boolean truefalse){
-		animMode = truefalse;
+	public void setNodeSizeAndNodeVertDist(int nodeSize, int nodeVertDist){
+		this.nodeSize = nodeSize;
+		this.nodeVertDist = nodeVertDist;
 	}
 	
-	public void handleMouseReleasedCoords(int mouseX, int mouseY, boolean leftButton){	
+//	public void updateXoffset(){	
+//		xOffset = getWidth() / 2;
+//	}
+	
+	public void handleMouseRelease(int clickX, int clickY, int releaseX, int releaseY, boolean leftButton){		
+		//System.out.println("clickX: " + clickX + "  clickY: " + clickY + "  releaseX: " + releaseX + "  releaseY: " + releaseY);	
 		if(!inAnimation)	
-			if(graphToShow != null){		
-				Node clickedNode = null;	
-				for(Node node : graphToShow.getNodes()){
-					double boundaryLEFT = node.getX() + xOffset - nodeSize/2;
+			if(currentFrame != null){
+						
+				Point clickedPoint = null;
+				Point releasedPoint = null;
+				Point closestPointToRelease = null;
+				double closest = 1000;
+				boolean rightFromThis = true;
+				
+				for(Point point : currentFrame.points){
+					double boundaryLEFT = point.x + xOffset - nodeSize / 2;
 					double boundaryRIGHT = boundaryLEFT + nodeSize;
-					double boundaryUP = node.getY() + yOffset - nodeSize/2;
+					double boundaryUP = point.y + yOffset - nodeSize / 2;
 					double boundaryDOWN = boundaryUP + nodeSize;	
-					if(mouseX > boundaryLEFT && mouseX < boundaryRIGHT && mouseY > boundaryUP  && mouseY < boundaryDOWN)
-						clickedNode = node;		
-				}	
-				if(clickedNode != null && !(clickedNode.getIsRoot() && !leftButton)){ //can't delete rootnode
-					m.handleNodeClicked(clickedNode, leftButton);
-					if(animMode){
-						cp.disableAll();
-						animate(graphToShow, m.getGraph());	
-					}
-					else
-						animateSequence(m.getAnimationBuffer());							
+					if(clickX > boundaryLEFT && clickX < boundaryRIGHT && clickY > boundaryUP  && clickY < boundaryDOWN)
+						clickedPoint = point;		
+					if(releaseX > boundaryLEFT && releaseX < boundaryRIGHT && releaseY > boundaryUP  && releaseY < boundaryDOWN)
+						releasedPoint = point;	
+				}
+				
+				if(clickedPoint != null && clickedPoint != releasedPoint){
+					for(Point point : currentFrame.points)
+						if(point != clickedPoint){
+							double pointDistToRelease = Math.sqrt(Math.pow(releaseX - (point.x + xOffset), 2) + Math.pow(releaseY - (point.y + yOffset), 2));
+							if(closest > pointDistToRelease){
+								closest = pointDistToRelease;
+								closestPointToRelease = point;
+								rightFromThis = releaseX > (point.x + xOffset);
+							}
+					}		
+				}
+				if(clickedPoint != null){
+					if(clickedPoint == releasedPoint)
+						controlPanel.handleNodeClicked(clickedPoint.nodeID, leftButton);	
+					else				
+						if(leftButton && closestPointToRelease != null)
+							if(controlPanel.getHorizOrderIndex() == 0){
+								controlPanel.handleNodeClicked(clickedPoint.nodeID, closestPointToRelease.nodeID, rightFromThis);	
+								System.out.println("wanting to add a node under parent: " + clickedPoint.nodeID + " thats close to this child: " + closestPointToRelease.nodeID + " on the right side: " + rightFromThis);
+							}
+							else
+								JOptionPane.showMessageDialog(null, "placing children at specific places only makes sense when the order-index is chronological"
+										+ ", all other options overwrite the horizontal order anyway", "wrong order-modus", JOptionPane.PLAIN_MESSAGE);	
 				}
 			}
+	}	
+
+	
+	public void setTimeline(Timeline timeline){
+		this.timeline = timeline;
+		showTimeline();
 	}
 	
+	public void setAnimIndex(int index) {
+		animIndex = index;
+		if(timeline != null)
+			showTimeline();
+	}
 	
-	public void updateGraphToShow(Graph graph){
-		graphToShow = graph;
-		repaint();
+	private void showTimeline(){			
+		if(animIndex == 0 || timeline.keyframesNodewise == null){
+			currentFrame = timeline.singleFinalKeyframe;
+			repaint();
+		}
+		else{
+			frames = timeline.placeStepsBtwnKeyframes(animIndex, animStepsBtwnKeyframes);
+			System.out.println("size of frames: " + frames.size());
+			currentAnimStep = 0;
+			inAnimation = true;
+			animationAllowed = true;
+			controlPanel.enableSwitch(false);
+			animationPanel.enableSwitch(false);
+			new Thread(new Runnable(){public void run() { 
+	            new Animator(thisGraphPanel).triggerUpdating(frames.size()); 
+	        }}).start(); 
+		}
 	}
 
-	public void animateSequence(ArrayList<Graph> animSequence){
-		inAnimSequence = true;
-		cp.disableAll();
-		animSeqSize = animSequence.size();
-		
-		this.animSequence = animSequence;
-		animPos = 0;
-		nextStepInAnimSequence();
+	public void pauseAnimation(){
+		animationAllowed = false;
 	}
 	
-	private void nextStepInAnimSequence(){
-		animate(animSequence.get(animPos), animSequence.get(animPos + 1));
-		System.out.println("  " + animSequence.get(animPos + 1).getAnimMetaInfo());
-		animPos ++;
+	public boolean getAnimationAllowed(){
+		return animationAllowed;
 	}
 	
-	public void disableControlPanel(){
-		cp.disableAll();
+	
+	public void continueAnimation(){
+		animationAllowed = true;
+		new Thread(new Runnable(){public void run() { 
+            new Animator(thisGraphPanel).triggerUpdating(frames.size() - currentAnimStep); 
+        }}).start(); 
+	}
+	
+	public void stopAnimation(){
+		animationAllowed = false;
+		currentFrame = frames.get(frames.size() - 1);
+		repaint();
+		animationFinished();
 	}
 	
 	public void updateAnimation(){
-		for(Node node : graphToShow.getNodes()){			
-			node.setX(node.getX() + node.getDeltaXAnim());
-			node.setY(node.getY() + node.getDeltaYAnim());		
-		}	
-	}
-	
-	public void animate(Graph fromGraph, Graph toGraph){					
-		int i = 0;	
-		ArrayList<Node> fromNodes = fromGraph.getNodes();
-		ArrayList<Node> toNodes = toGraph.getNodes();	
-		for(Node fromNode : fromNodes){
-			Node toNode = toNodes.get(i);
-			double deltaX = (toNode.getX() - fromNode.getX()) / animSteps;
-			double deltaY = (toNode.getY() - fromNode.getY()) / animSteps;
-			fromNode.setDeltaXAnim(deltaX);
-			fromNode.setDeltaYAnim(deltaY);
-			i ++;
+		if(animationAllowed){
+			currentFrame = frames.get(currentAnimStep);
+			currentAnimStep ++;
 		}
-		updateGraphToShow(fromGraph);	
-		inAnimation = true;
-			
-		new Thread(new Runnable(){public void run() {
-			animate.triggerUpdating(animSteps);
-		}}).start();
-			
 	}
 	
 	public void animationFinished(){
 		inAnimation = false;
-		graphToShow = m.getGraph();
-		repaint();
-		System.out.println("  did one animation step");
-		
-		if(inAnimSequence)
-			if(animPos < animSeqSize - 1){
-				nextStepInAnimSequence();
-				inAnimation = true;
-			}
-			else{
-				inAnimSequence = false;	
-				System.out.println("  animation sequence finished");
-				cp.enableAll();
-			}
-		else
-			cp.enableAll();
-		
-		
+		controlPanel.enableSwitch(true);
+		animationPanel.enableSwitch(true);
+		System.out.println("animation finished");
 	}
 	
 
 	//double buffer setup via youtu.be/4T3WJEH7zrc
 	public void paint(Graphics g){
-		if(graphToShow != null){
+		if(currentFrame != null){
 			dbImage = createImage(getWidth(), getHeight());
 			dbg = dbImage.getGraphics();
 			paintComponent(dbg);
@@ -172,49 +201,72 @@ public class GraphPanel extends JPanel{
 	}
 	
 	public void paintComponent(Graphics g){	
-		g.setColor(Color.WHITE);
-		g.fillRect(0, 0, this.getWidth(), this.getHeight());
+		Graphics2D g2d = (Graphics2D) g.create();
+		
+		g2d.setColor(Color.WHITE);
+		g2d.fillRect(0, 0, this.getWidth(), this.getHeight());
 			
-		if(!animMode){
-			g.setColor(Color.LIGHT_GRAY);
-			g.drawLine(xOffset, 0, xOffset, getHeight());
+		//g.setColor(Color.LIGHT_GRAY);
+		//g.drawLine(xOffset, 0, xOffset, getHeight());
+			
+		g2d.setColor(Color.DARK_GRAY);
+		for(Line line : currentFrame.lines)
+			g2d.drawLine((int) line.source.x + xOffset, (int) line.source.y + yOffset, (int) line.target.x + xOffset, (int) line.target.y + yOffset);		
+		g2d.setColor(new Color(0, 0, 128));
+		for(Point point : currentFrame.points){
+			int x = (int) (point.x + xOffset);
+			int y = (int) (point.y + yOffset);
+			g2d.fillOval(x - nodeSize / 2, y - nodeSize / 2, nodeSize, nodeSize);	
+			
+			if(showNodeID){
+				g.setColor(Color.GRAY);
+				g.drawString(point.nodeID, x - 45, y + 25);
+			}
 		}
-			
-		ArrayList<Node> nodes = graphToShow.getNodes();
-		ArrayList<Edge> edges = graphToShow.getEdges();
-			
-		//edges
-		g.setColor(Color.DARK_GRAY);
-		for(int i = 0; i < edges.size(); i++){
-			Node source = findNodeByID(nodes, edges.get(i).getSourceID());
-			Node target = findNodeByID(nodes, edges.get(i).getTargetID());
-			g.drawLine((int) source.getX() + xOffset, (int) source.getY() + yOffset, (int) target.getX() + xOffset, (int) target.getY() + yOffset);			
-		}
-				
-		//nodes
-		g.setColor(new Color(0, 0, 128));
-		for(int i = 0; i < nodes.size(); i++){
-			Node node = nodes.get(i);
-			int x = (int) (node.getX() + xOffset - nodeSize / 2);
-			int y = (int) (node.getY() + yOffset - nodeSize / 2);
-//			
-//			if(node.getIsRoot())
-//				System.out.println("root y: " + y);
-			
-			g.fillOval(x, y, nodeSize, nodeSize);
-//			g.setColor(Color.BLACK);
-//			g.drawString(node.getValue(), x, y + 10);
-//			g.drawString(Integer.toString(node.getHorizontal()), x, y + 20);
-//			g.drawString(Integer.toString(node.getVertical()), x, y + 30);
+		if(showHelplines){
+			g2d.setColor(Color.RED);
+			g2d.setStroke(new BasicStroke(3));
+			for(Line helpline : currentFrame.helplines)
+				g2d.drawLine((int) helpline.source.x + xOffset, (int) helpline.source.y + yOffset, (int) helpline.target.x + xOffset, (int) helpline.target.y + yOffset);	
 		}
 	}
 
-	
-	private Node findNodeByID(ArrayList<Node> nodes, String ID){
-		for(int i = 0; i < nodes.size(); i++)
-			if(nodes.get(i).getID().equals(ID))
-				return nodes.get(i);	
-		return null;
+	public void setShowNodeID(boolean onoff) {
+		showNodeID = onoff;
+		repaint();
 	}
-	
+
+	public void setShowHelplines(boolean onoff) {
+		showHelplines = onoff;
+		if(timeline != null)
+			showTimeline();
+		System.out.println("showing helplines: " + showHelplines);
+	}
 }
+
+
+
+
+
+//// OLD
+//
+////edges
+//g.setColor(Color.DARK_GRAY);
+//for(Edge edge : graph.getEdges()){
+//	int sourceX = (int) edge.getSource().getX() + xOffset;
+//	int sourceY = (int) edge.getSource().getY() + yOffset;
+//	int targetX = (int) edge.getTarget().getX() + xOffset;
+//	int targetY = (int) edge.getTarget().getY() + yOffset;
+//	g.drawLine(sourceX, sourceY, targetX, targetY);			
+//}			
+////nodes
+//g.setColor(new Color(0, 0, 128));
+//for(Node node : graph.getNodes()){
+//	int x = (int) (node.getX() + xOffset - nodeSize / 2);
+//	int y = (int) (node.getY() + yOffset - nodeSize / 2);		
+//	g.fillOval(x, y, nodeSize, nodeSize);
+////	g.setColor(Color.BLACK);
+////	g.drawString(node.getValue(), x, y + 10);
+////	g.drawString(Integer.toString(node.getHorizontal()), x, y + 20);
+////	g.drawString(Integer.toString(node.getVertical()), x, y + 30);
+//}

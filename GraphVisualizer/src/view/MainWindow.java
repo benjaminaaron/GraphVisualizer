@@ -1,9 +1,6 @@
 package view;
 
 import java.awt.BorderLayout;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-
 import javax.swing.JFrame;
 
 import model.Model;
@@ -12,44 +9,44 @@ import model.Model;
 public class MainWindow extends JFrame{
 
 	private static final long serialVersionUID = 1L;
-
-	private ControlPanel cp;
-	private GraphPanel gp;
+	private ControlPanel controlPanel;
+	private GraphPanel graphPanel;
+	private AnimationPanel animationPanel;
 	
-	public MainWindow(Model m){
+	public MainWindow(){
 		super("simple tree-graph visualizer by benjaminaaron");
 		
-		setLayout(new BorderLayout());
-		cp = new ControlPanel(m);
-		gp = new GraphPanel(m, cp);	
-		add(gp, BorderLayout.CENTER);
-		add(cp, BorderLayout.NORTH);		
-		
-		cp.setEnabled(false);
-		
-		setSize(900, 600);
-		
-		setVisible(true);
+		setSize(1300, 600);	
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setLayout(new BorderLayout());
 		
-        this.getRootPane().addComponentListener(new ComponentAdapter() {
-            public void componentResized(ComponentEvent e) {
-            	updateXoffset();
-            }
-        });
-        
-	}
-	
-	public void updateXoffset(){		
-		gp.updateXoffset();
+		graphPanel = new GraphPanel();	
+		controlPanel = new ControlPanel(graphPanel);
+		animationPanel = new AnimationPanel(graphPanel);
+		graphPanel.setControlAndSliderPanel(controlPanel, animationPanel);
+		
+		add(graphPanel, BorderLayout.CENTER);
+		add(controlPanel, BorderLayout.NORTH);	
+		add(animationPanel, BorderLayout.SOUTH);
+				
+//        this.getRootPane().addComponentListener(new ComponentAdapter() {
+//            public void componentResized(ComponentEvent e) {
+//            	hub.updateXoffset();
+//            }
+//        }); 
+		setVisible(true);	
 	}
 	
 	public ControlPanel getControlPanel(){
-		return cp;
+		return controlPanel;
 	}
-	
-	public GraphPanel getGraphPanel(){
-		return gp;
+
+	public GraphPanel getGraphPanel() {
+		return graphPanel;
+	}
+
+	public AnimationPanel getAnimationPanel() {
+		return animationPanel;
 	}
 	
 }

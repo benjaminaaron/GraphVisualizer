@@ -4,12 +4,12 @@ import model.Model;
 import view.MainWindow;
 
 public class Driver {
-
 	public static void main(String[] args) {
-		Model m = new Model();
-		MainWindow mw = new MainWindow(m);	
-		m.setGraphPanel(mw.getGraphPanel(), mw.getControlPanel());	
-		m.initNewGraph();
+		Model model = new Model();	
+		MainWindow mainWindow = new MainWindow();	
+		mainWindow.getControlPanel().setModel(model);
+		mainWindow.getAnimationPanel().setModel(model);
+		//start with sample graph instead of gray, simulates click on <sample> button
+		mainWindow.getControlPanel().initSampleGraph();
 	}
-
 }
