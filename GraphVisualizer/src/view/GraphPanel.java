@@ -40,6 +40,7 @@ public class GraphPanel extends JPanel{
 	private int currentAnimStep;
 	private boolean inAnimation = false;
 	private boolean animationAllowed = true;
+	private int animSpeed = 33;
 	
 	private boolean showNodeID = false;
 	private boolean showHelplines = false;
@@ -52,6 +53,22 @@ public class GraphPanel extends JPanel{
 	public GraphPanel(){						
 		MouseControl mc = new MouseControl(this);
 		addMouseListener(mc);
+	}
+	
+	//TODO this definitely needs a slider or some cool smart self-checking adaption...
+	public void setOffset(int xOffset, int yOffset){
+		this.xOffset = xOffset;
+		this.yOffset = yOffset;
+	}
+	
+	public void setAnimSpeed(int animSpeed){
+		this.animSpeed = animSpeed;	
+		if(!inAnimation)
+			showTimeline();
+	}
+	
+	public int getAnimSpeed(){
+		return animSpeed;
 	}
 	
 	public void setControlAndSliderPanel(ControlPanel controlPanel, AnimationPanel animationPanel) {
@@ -211,7 +228,8 @@ public class GraphPanel extends JPanel{
 			
 		g2d.setColor(Color.DARK_GRAY);
 		for(Line line : currentFrame.lines)
-			g2d.drawLine((int) line.source.x + xOffset, (int) line.source.y + yOffset, (int) line.target.x + xOffset, (int) line.target.y + yOffset);		
+			if(!(line.target.x == 0 && line.target.y == 0)) //don't draw the lines when the target is still at 0,0 = not placed yet (rootnode can never be target)
+				g2d.drawLine((int) line.source.x + xOffset, (int) line.source.y + yOffset, (int) line.target.x + xOffset, (int) line.target.y + yOffset);		
 		g2d.setColor(new Color(0, 0, 128));
 		for(Point point : currentFrame.points){
 			int x = (int) (point.x + xOffset);

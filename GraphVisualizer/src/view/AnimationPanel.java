@@ -26,9 +26,9 @@ public class AnimationPanel extends JPanel {
 	private GraphPanel graphPanel;
 	
 	private JButton pauseButton, stopButton;
-	private JLabel animLabel, blankLabel, nodeSizeLabel, nodeVertDistLabel, nodeMinHorizDistLabel;
+	private JLabel animLabel, animSpeedLabel, blankLabel, nodeSizeLabel, nodeVertDistLabel, nodeMinHorizDistLabel;
 	private JRadioButton noAnim, shortAnim, levelByLevelAnim, nodeByNodeAnim;
-	private JSlider nodeSizeSlider, nodeVertDistSlider, nodeMinHorizDistSlider; 
+	private JSlider animSpeedSlider, nodeSizeSlider, nodeVertDistSlider, nodeMinHorizDistSlider; 
 	private JCheckBox showNodeIDCheckbox, showHelplinesCheckbox;
 	
 	private int nodeSize = 20;
@@ -98,6 +98,23 @@ public class AnimationPanel extends JPanel {
 		add(levelByLevelAnim);
 		add(nodeByNodeAnim);
 		
+		
+		animSpeedLabel = new JLabel(" framepause:");
+		add(animSpeedLabel);
+		
+		animSpeedSlider = new JSlider();
+		animSpeedSlider.setValue(30);
+		animSpeedSlider.setMinimum(2);
+		animSpeedSlider.setMaximum(60);	
+		animSpeedSlider.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent ce){
+				if(!animSpeedSlider.getValueIsAdjusting())
+					changeAnimSpeed();
+			}
+	        });
+		add(animSpeedSlider);
+		
 		pauseButton = new JButton("pause");
 		pauseButton.setEnabled(false);
 		pauseButton.addMouseListener(new MouseAdapter() {
@@ -165,7 +182,7 @@ public class AnimationPanel extends JPanel {
 	        });
 		add(nodeMinHorizDistSlider);
 		
-		showNodeIDCheckbox = new JCheckBox("show node-IDs");
+		showNodeIDCheckbox = new JCheckBox("node-IDs");
 		showNodeIDCheckbox.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -175,7 +192,7 @@ public class AnimationPanel extends JPanel {
 		});	
 		add(showNodeIDCheckbox);
 		
-		showHelplinesCheckbox = new JCheckBox("show helplines");
+		showHelplinesCheckbox = new JCheckBox("helplines");
 		showHelplinesCheckbox.setEnabled(false);
 		showHelplinesCheckbox.addMouseListener(new MouseAdapter() {
 			@Override
@@ -187,8 +204,6 @@ public class AnimationPanel extends JPanel {
 			}
 		});	
 		add(showHelplinesCheckbox);
-		
-		
 	}
 	
 	
@@ -208,6 +223,10 @@ public class AnimationPanel extends JPanel {
 		}
 		else
 			JOptionPane.showMessageDialog(null, "can't change parameters unless in animation modus <none>", "wrong animation modus", JOptionPane.PLAIN_MESSAGE);	
+	}
+	
+	private void changeAnimSpeed() {
+		graphPanel.setAnimSpeed(animSpeedSlider.getValue());
 	}
 	
 	
@@ -249,7 +268,7 @@ public class AnimationPanel extends JPanel {
 
 	public void enableSwitch(boolean onoff) {
 		pauseButton.setEnabled(!onoff);
-		stopButton.setEnabled(!onoff);	
+		stopButton.setEnabled(!onoff);
 		
 		animLabel.setEnabled(onoff);
 		noAnim.setEnabled(onoff);

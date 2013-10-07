@@ -16,7 +16,7 @@ public class MainWindow extends JFrame{
 	public MainWindow(){
 		super("simple tree-graph visualizer by benjaminaaron");
 		
-		setSize(1300, 600);	
+		setSize(1350, 600);	
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLayout(new BorderLayout());
 		

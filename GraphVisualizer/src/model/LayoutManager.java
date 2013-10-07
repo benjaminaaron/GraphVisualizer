@@ -2,7 +2,7 @@ package model;
 
 public class LayoutManager{
 
-    private LayoutInterface layoutAlgorithm;
+    private LayoutInterface layoutAlgorithm; // by Sanjo, much nicer because the layouting-object is already passed on from the ControlPanel and it saves many "if index == xy" lines in the performLayout method 
 	private int nodeSize;
 	private int nodeVertDist;
 	private int nodeMinHorizDist;
@@ -30,8 +30,6 @@ public class LayoutManager{
 		graph.resetNodesPos();
 		graph.setFirstKeyframe();
 		
-		return (layoutAlgorithm == null)
-                ? null
-                : layoutAlgorithm.performLayout(graph, nodeSize, nodeMinHorizDist, nodeVertDist);
+		return (layoutAlgorithm == null) ? null : layoutAlgorithm.performLayout(graph, nodeSize, nodeMinHorizDist, nodeVertDist);
 	}	
 }

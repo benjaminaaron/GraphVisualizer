@@ -17,26 +17,60 @@ public class Node {
 
 	private double x = 0;
 	private double y = 0;
+		
+	private double angle = 0;
+	private double corridorStart, corridorEnd, corridorSpanning;
 	
-	private double arc;
-	private double angle;
-	
-	public void setArc(double arc){
-		this.arc = arc;
+	public void setCorridor(double corridorStart, double corridorEnd){
+		this.corridorStart = corridorStart;
+		this.corridorEnd = corridorEnd;
+		corridorSpanning = corridorEnd - corridorStart;
 	}
 	
-	public double getArc(){
-		return arc;
+	public double getCorridorStart(){
+		return corridorStart;
 	}
 	
-	public void setAngle(double angle){
-		this.angle = angle;
+	public double getCorridorEnd(){
+		return corridorEnd;
+	}
+	
+	public double getCorridorSpanning(){
+		return corridorSpanning;
+	}
+	
+	public void placingForRadialPlain(int nodeVertDist) {
+		
+		double deltaAngle = corridorSpanning / children.size();
+		double lastCorridorBorder = corridorStart;
+		double nextCorridorBorder = lastCorridorBorder + deltaAngle;
+				
+		int i = 0;
+		for(Node child : children){
+			double newAngle = corridorStart + deltaAngle / 2 + deltaAngle * i;
+			child.setAngle(nodeVertDist, newAngle);		
+			child.setCorridor(lastCorridorBorder, nextCorridorBorder);
+			
+			System.out.println("just gave " + child.getID() + " the angle: " + Math.round(newAngle) + " and the corridor from: " + Math.round(lastCorridorBorder) +" to: " + Math.round(nextCorridorBorder));
+			
+			lastCorridorBorder = nextCorridorBorder;
+			nextCorridorBorder += deltaAngle;				
+			i ++;		
+			child.placingForRadialPlain(nodeVertDist);
+		}
+	}
+	
+	
+	public void setAngle(int nodeVertDist, double angle){
+		this.angle = angle;		
+		double rad = (angle / 180) * Math.PI; //conversion into radiants, could just as well do it in rad only, but for understanding its better in degrees :) and actually has sort of higher precision		
+		setPos(vertical * nodeVertDist * Math.cos(rad), - vertical * nodeVertDist * Math.sin(rad));	
 	}
 	
 	public double getAngle(){
 		return angle;
 	}
-	
+
 	
 	public void resetNode(){
 		//but not pos! in order to allow the short-animation to function nicely
@@ -51,6 +85,11 @@ public class Node {
 		this.x = x;
 		this.y = y;
 	}
+	
+//	public void putMyChildrenAtMyPos() {
+//		for(Node child : children)
+//			child.setPos(x, y);
+//	}
 
 	public Point getPoint(){
 		return new Point(ID, x, y);
@@ -93,26 +132,6 @@ public class Node {
 		children.add(target);
 	}
 	
-//	public void interveneInChildrenOrder(Node marker, boolean rightFromThis) {
-//		Node toRearrange = children.get(children.size() - 1);
-//		
-//		int indexOfMarker = children.indexOf(marker);
-//		if(rightFromThis)
-//			indexOfMarker += 1;
-//		
-//		Node[] array = new Node[children.size()];
-//		
-//		for(int i = 0; i < indexOfMarker; i++)
-//			array[i] = children.get(i);
-//		
-//		array[indexOfMarker] = toRearrange;
-//		
-//		for(int i = indexOfMarker + 1; i < children.size(); i++)
-//			array[i] = children.get(i);
-//			
-//		children.clear();
-//		Collections.addAll(children, array);	
-//	}
 	
 	public void swapChildren(int orderIndex){ // 1 = left, 2 = right, 3 = middle full, 4 = middle empty		
 		int factor = 1;
@@ -218,10 +237,12 @@ public class Node {
 		return totalChildren;
 	}
 
+	//simplified by Sanjo
 	public boolean getIsLeaf(){
 		return children.isEmpty();
 	}
 	
+	//simplified by Sanjo
 	public boolean getIsRoot(){
 		return parent == null;
 	}
@@ -246,6 +267,8 @@ public class Node {
 				temp = true;
 		return temp;
 	}
+
+
 
 
 	

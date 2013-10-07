@@ -11,7 +11,7 @@ public class Animator {
 	public void triggerUpdating(int animSteps){							
 		while(animSteps > 0 && graphPanel.getAnimationAllowed()){	
 			try {
-				Thread.sleep(30);
+				Thread.sleep(graphPanel.getAnimSpeed());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}			

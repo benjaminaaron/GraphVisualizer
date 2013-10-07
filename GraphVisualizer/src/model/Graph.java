@@ -11,7 +11,6 @@ public class Graph{
 	private Node rootnode;
 	private int maxVertical = 0;
 	private ArrayList<Node> forAllAttached = new ArrayList<>();
-	
 
 	private Frame[] keyframesTwo = new Frame[2];
 	private ArrayList<Frame> keyframesLevelwise = new ArrayList<>();
@@ -35,7 +34,8 @@ public class Graph{
 	
 	public void nodeSetPos(Node node, double x, double y){		
 		node.setPos(x, y);	
-		keyframesNodewise.add(takeKeyframeNow());
+		if(node != rootnode) //otherwise that feels like "lagging" when there is an anim-step for the rootnode-placement on 0,0 because it IS already on 0,0
+			keyframesNodewise.add(takeKeyframeNow());
 	}
 	
 	public void addHelplinesKeyframe(ArrayList<Line> helplines){

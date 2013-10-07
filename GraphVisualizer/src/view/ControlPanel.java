@@ -20,9 +20,9 @@ public class ControlPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	
-	private JLabel graphLabel, layoutLabel, animLabel, orderLabel;
+	private JLabel layoutLabel, animLabel, orderLabel; //graphLabel
 	private JButton newButton, sampleButton, importButton, exportButton, helpButton, consoleShowButton;
-	private JRadioButton basicLayout, treeLayout, randomLayout, chronoOrder, leftOrder, rightOrder, middleFullOrder, middleEmptyOrder; //radialLayout
+	private JRadioButton basicLayout, treeLayout, radialPlainLayout, radialSmartLayout, randomLayout, chronoOrder, leftOrder, rightOrder, middleFullOrder, middleEmptyOrder;
 	
 	private Model model;
 	private GraphPanel graphPanel;
@@ -58,8 +58,8 @@ public class ControlPanel extends JPanel {
 		
 		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		
-		graphLabel = new JLabel("  Graph: ");
-		add(graphLabel);
+//		graphLabel = new JLabel("  Graph: ");
+//		add(graphLabel);
 				
 		newButton = new JButton("new");
 		newButton.addMouseListener(new MouseAdapter() {
@@ -106,7 +106,7 @@ public class ControlPanel extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(basicLayout.isEnabled())
-					setLayoutAlgorithm(new BasicLayout());
+					setLayoutAlgorithm(0, new BasicLayout());
 			}
 		});	
 		treeLayout = new JRadioButton("tree");
@@ -115,36 +115,48 @@ public class ControlPanel extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(treeLayout.isEnabled())
-					setLayoutAlgorithm(new TreeLayout());
+					setLayoutAlgorithm(1, new TreeLayout());
 			}
 		});	
-//		radialLayout = new JRadioButton("radial");
-//		radialLayout.addMouseListener(new MouseAdapter() {
-//			@Override
-//			public void mouseReleased(MouseEvent e) {
-//				if(radialLayout.isEnabled())
-//					setLayoutAlgorithm(new RadialLayout());
-//			}
-//		});	
+		radialPlainLayout = new JRadioButton("radial plain");
+		radialPlainLayout.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if(radialPlainLayout.isEnabled())
+					setLayoutAlgorithm(2, new RadialPlainLayout());
+			}
+		});
+		radialSmartLayout = new JRadioButton("radial smart");
+		radialSmartLayout.setEnabled(false);
+		radialSmartLayout.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				JOptionPane.showMessageDialog(null, "in the next version :)", "coming up soon...", JOptionPane.PLAIN_MESSAGE);
+//				if(radialSmartLayout.isEnabled())
+//					setLayoutAlgorithm(3, new RadialSmartLayout());
+			}
+		});
 		randomLayout = new JRadioButton("random");
 		randomLayout.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(randomLayout.isEnabled())
-					setLayoutAlgorithm(new RandomLayout());
+					setLayoutAlgorithm(4, new RandomLayout());
 			}
 		});	
 		layoutGroup.add(basicLayout);
 		layoutGroup.add(treeLayout);
-		//layoutGroup.add(radialLayout);
+		layoutGroup.add(radialPlainLayout);
+		layoutGroup.add(radialSmartLayout);
 		layoutGroup.add(randomLayout);
 		add(basicLayout);
 		add(treeLayout);
-		//add(radialLayout);
+		add(radialPlainLayout);
+		add(radialSmartLayout);
 		add(randomLayout);		
 
 		
-		orderLabel = new JLabel("          Order: ");
+		orderLabel = new JLabel("   |  Order: ");
 		add(orderLabel);
 		
 		ButtonGroup orderGroup = new ButtonGroup();
@@ -234,10 +246,12 @@ public class ControlPanel extends JPanel {
 							+ "\nright mouse-click:  delete a node & everything attached to it"
 							+ "\n\nimport & export in graphml-format / e.g. yEd (freeware) uses that"
 							+ "\nin the animation mode 'nodewise' there is a first attempt to show helplines, if activated"
+							+ "\nradial plain looks cool when just one rootnode-child gets looots of children - and then add another rootnode-child"
 							+ "\n\ncrash-causes:"
 							+ "\n- at this point this program can only handle strict tree-structures (every node but the rootnode has exactly one parent)"
 							+ "\n   importing other kind of graphs might result in funny things"
-							+ "\n\n\nbenjaminaaron / Version 2 / October 2013", "help", JOptionPane.PLAIN_MESSAGE);
+							+ "\n- ... you tell me? probably quite some :)"
+							+ "\n\n\nbenjaminaaron / Version 3 / October 2013", "help", JOptionPane.PLAIN_MESSAGE);
 			}
 		});	
 		add(helpButton);
@@ -272,8 +286,11 @@ public class ControlPanel extends JPanel {
 		graphPanel.setTimeline(model.getTimeline());
 	}
 	
-	private void setLayoutAlgorithm(LayoutInterface layoutAlgorithm){
+	private void setLayoutAlgorithm(int index, LayoutInterface layoutAlgorithm){
 		this.layoutAlgorithm = layoutAlgorithm;
+		
+		graphPanel.setOffset(650, index == 2 || index == 3 ? 200 : 80);
+		
 		model.setLayoutAlgorithm(layoutAlgorithm);
 		graphPanel.setTimeline(model.getTimeline());
 	}
@@ -295,7 +312,7 @@ public class ControlPanel extends JPanel {
 	}	
 	
 	public void enableSwitch(boolean onoff){
-		graphLabel.setEnabled(onoff);
+		//graphLabel.setEnabled(onoff);
 		layoutLabel.setEnabled(onoff);
 		orderLabel.setEnabled(onoff);
 		newButton.setEnabled(onoff);
@@ -306,7 +323,8 @@ public class ControlPanel extends JPanel {
 		consoleShowButton.setEnabled(onoff);
 		basicLayout.setEnabled(onoff);
 		treeLayout.setEnabled(onoff);
-		//radialLayout.setEnabled(onoff);
+		radialPlainLayout.setEnabled(onoff);
+		//radialSmartLayout.setEnabled(onoff);
 		randomLayout.setEnabled(onoff);			
 		chronoOrder.setEnabled(onoff);	
 		leftOrder.setEnabled(onoff);
