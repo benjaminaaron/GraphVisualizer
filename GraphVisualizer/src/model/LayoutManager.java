@@ -1,14 +1,14 @@
 package model;
 
 public class LayoutManager{
-	
-	private int layoutIndex;
+
+    private LayoutInterface layoutAlgorithm;
 	private int nodeSize;
 	private int nodeVertDist;
 	private int nodeMinHorizDist;
 
-	public LayoutManager(int layoutIndex, int nodeSize, int nodeVertDist, int nodeMinHorizDist){
-		this.layoutIndex = layoutIndex;
+	public LayoutManager(LayoutInterface layoutAlgorithm, int nodeSize, int nodeVertDist, int nodeMinHorizDist){
+		this.layoutAlgorithm = layoutAlgorithm;
 		this.nodeSize = nodeSize;
 		this.nodeVertDist = nodeVertDist;
 		this.nodeMinHorizDist = nodeMinHorizDist;
@@ -19,10 +19,10 @@ public class LayoutManager{
 		this.nodeVertDist = nodeVertDist;
 		this.nodeMinHorizDist = nodeMinHorizDist;
 	}
-	
-	public void setLayoutIndex(int index){
-		layoutIndex = index;
-	}
+
+    public void setLayoutAlgorithm(LayoutInterface layoutAlgorithm) {
+        this.layoutAlgorithm = layoutAlgorithm;
+    }
 	
 	public Graph performLayout(Graph graph) {	
 		graph.clearTimeline();
@@ -30,15 +30,8 @@ public class LayoutManager{
 		graph.resetNodesPos();
 		graph.setFirstKeyframe();
 		
-		if(layoutIndex == 1)
-			return new BasicLayout().performLayout(graph, nodeSize, nodeMinHorizDist, nodeVertDist);
-		if(layoutIndex == 2)
-			return new TreeLayout().performLayout(graph, nodeSize, nodeMinHorizDist, nodeVertDist);
-//		if(layoutIndex == 3)
-//			return new RadialLayout().performLayout(graph, nodeSize, nodeMinHorizDist, nodeVertDist);
-		if(layoutIndex == 4)
-			return new RandomLayout().performLayout(graph, nodeSize, nodeMinHorizDist, nodeVertDist);
-		
-		return null;
+		return (layoutAlgorithm == null)
+                ? null
+                : layoutAlgorithm.performLayout(graph, nodeSize, nodeMinHorizDist, nodeVertDist);
 	}	
 }

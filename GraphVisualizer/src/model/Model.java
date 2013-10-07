@@ -14,8 +14,8 @@ public class Model {
 	
 	public Model(){}
 	
-	public void setParams(int layoutIndex, int nodeSize, int nodeVertDist, int nodeMinHorizDist){
-		layoutManager = new LayoutManager(layoutIndex, nodeSize, nodeVertDist, nodeMinHorizDist);
+	public void setParams(LayoutInterface layoutAlgorithm, int nodeSize, int nodeVertDist, int nodeMinHorizDist){
+		layoutManager = new LayoutManager(layoutAlgorithm, nodeSize, nodeVertDist, nodeMinHorizDist);
 	}
 	
 	public void changeNodeParams(int nodeSize, int nodeVertDist, int nodeMinHorizDist){
@@ -24,10 +24,10 @@ public class Model {
 		System.out.println("new node paramameters applied");
 	}
 	
-	public void setLayoutIndex(int index){
-		layoutManager.setLayoutIndex(index);
+	public void setLayoutAlgorithm(LayoutInterface layoutAlgorithm){
+		layoutManager.setLayoutAlgorithm(layoutAlgorithm);
 		graph = layoutManager.performLayout(graph);
-		System.out.println("layout change to index: " + index);
+		System.out.println("layout change to layoutAlgorithm: " + layoutAlgorithm);
 	}
 	
 	public void setOrderIndex(int index){

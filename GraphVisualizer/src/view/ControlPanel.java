@@ -13,11 +13,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import model.Frame;
-import model.Importer;
-import model.Model;
-import model.Point;
-import model.Timeline;
+import model.*;
 
 
 public class ControlPanel extends JPanel {
@@ -31,7 +27,7 @@ public class ControlPanel extends JPanel {
 	private Model model;
 	private GraphPanel graphPanel;
 	
-	private int layoutIndex = 2;
+	private LayoutInterface layoutAlgorithm = new TreeLayout();
 	private int horizOrderIndex = 0;
 	
 	private int nodeSize = 20;
@@ -41,7 +37,7 @@ public class ControlPanel extends JPanel {
 	
 	public void setModel(Model model){
 		this.model = model;
-		model.setParams(layoutIndex, nodeSize, nodeVertDist, nodeMinHorizDist);
+		model.setParams(layoutAlgorithm, nodeSize, nodeVertDist, nodeMinHorizDist);
 	}
 	
 	public int getNodeSize() {
@@ -110,7 +106,7 @@ public class ControlPanel extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(basicLayout.isEnabled())
-					setLayoutIndex(1);
+					setLayoutAlgorithm(new BasicLayout());
 			}
 		});	
 		treeLayout = new JRadioButton("tree");
@@ -119,7 +115,7 @@ public class ControlPanel extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(treeLayout.isEnabled())
-					setLayoutIndex(2);
+					setLayoutAlgorithm(new TreeLayout());
 			}
 		});	
 //		radialLayout = new JRadioButton("radial");
@@ -127,7 +123,7 @@ public class ControlPanel extends JPanel {
 //			@Override
 //			public void mouseReleased(MouseEvent e) {
 //				if(radialLayout.isEnabled())
-//					setLayoutIndex(3);
+//					setLayoutAlgorithm(new RadialLayout());
 //			}
 //		});	
 		randomLayout = new JRadioButton("random");
@@ -135,7 +131,7 @@ public class ControlPanel extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(randomLayout.isEnabled())
-					setLayoutIndex(4);
+					setLayoutAlgorithm(new RandomLayout());
 			}
 		});	
 		layoutGroup.add(basicLayout);
@@ -276,9 +272,9 @@ public class ControlPanel extends JPanel {
 		graphPanel.setTimeline(model.getTimeline());
 	}
 	
-	private void setLayoutIndex(int index){
-		layoutIndex = index;
-		model.setLayoutIndex(index);
+	private void setLayoutAlgorithm(LayoutInterface layoutAlgorithm){
+		this.layoutAlgorithm = layoutAlgorithm;
+		model.setLayoutAlgorithm(layoutAlgorithm);
 		graphPanel.setTimeline(model.getTimeline());
 	}
 	
