@@ -12,8 +12,6 @@ public class Node {
 	private Node parent = null;
 	private ArrayList<Node> children = new ArrayList<>();
 	private int totalChildren = 0;
-	private boolean isLeaf = false;
-	private boolean isRoot = true;
 	private int vertical = -1;
 	private int horizontal = -1;
 
@@ -45,8 +43,6 @@ public class Node {
 		parent = null;
 		children.clear();
 		totalChildren = 0;
-		isLeaf = false;
-		isRoot = true;
 		vertical = -1;
 		horizontal = -1;
 	}
@@ -93,9 +89,7 @@ public class Node {
 	public void doChildParentHandshake(Node target) {
 		//target part
 		target.setParent(this);
-		target.setIsLeafNotRoot();		
 		//source part
-		isLeaf = false;
 		children.add(target);
 	}
 	
@@ -175,12 +169,6 @@ public class Node {
 		Collections.addAll(children, array);		
 		}
 	}
-
-	
-	public void setIsLeafNotRoot(){
-		isRoot = false;
-		isLeaf = true;
-	}
 	
 	public String getValue(){
 		return value;
@@ -199,7 +187,7 @@ public class Node {
 	}
 	
 	public String showFull(){
-		return showPure() + " | " + showCoordinates() + " | root: " + isRoot + " | leaf: " + isLeaf + " | vertical: " + vertical + " | horizontal: " + horizontal + " | parentID: [" + (parent == null ? "no parent" : parent.getID()) + "] | childrenIDs: " + listChildren() + " | totalChildren: " + totalChildren;
+		return showPure() + " | " + showCoordinates() + " | root: " + getIsLeaf() + " | leaf: " + getIsRoot() + " | vertical: " + vertical + " | horizontal: " + horizontal + " | parentID: [" + (parent == null ? "no parent" : parent.getID()) + "] | childrenIDs: " + listChildren() + " | totalChildren: " + totalChildren;
 	}
 	
 	private String listChildren(){
@@ -231,11 +219,11 @@ public class Node {
 	}
 
 	public boolean getIsLeaf(){
-		return isLeaf;
+		return children.isEmpty();
 	}
 	
 	public boolean getIsRoot(){
-		return isRoot;
+		return parent == null;
 	}
 	
 	public void setPosInGraph(int vertical, int horizontal) {
