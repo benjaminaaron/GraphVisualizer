@@ -25,6 +25,7 @@ public class ControlPanel extends JPanel {
 	private JRadioButton basicLayout, treeLayout, radialPlainLayout, radialSmartLayout, randomLayout, chronoOrder, leftOrder, rightOrder, middleFullOrder, middleEmptyOrder;
 	
 	private Model model;
+    private Animator animator;
 	private GraphPanel graphPanel;
 	
 	private LayoutInterface layoutAlgorithm = new TreeLayout();
@@ -33,12 +34,18 @@ public class ControlPanel extends JPanel {
 	private int nodeSize = 20;
 	private int nodeVertDist = 50;
 	private int nodeMinHorizDist = 30;
-	
-	
-	public void setModel(Model model){
+
+
+    public void setModel(Model model){
 		this.model = model;
+        // TODO (Jonas): Remove this side effect, because when the model is injected in other objects to,
+        // they might overwrite each other.
 		model.setParams(layoutAlgorithm, nodeSize, nodeVertDist, nodeMinHorizDist);
 	}
+
+    public void setAnimator(Animator animator) {
+        this.animator = animator;
+    }
 	
 	public int getNodeSize() {
 		return nodeSize;
@@ -309,8 +316,8 @@ public class ControlPanel extends JPanel {
 	private void importGraph() throws IOException{		
 		model.loadImportedGraph(Importer.convertGraphmlFileToGraph());
 		graphPanel.setTimeline(model.getTimeline());
-	}	
-	
+	}
+
 	public void enableSwitch(boolean onoff){
 		//graphLabel.setEnabled(onoff);
 		layoutLabel.setEnabled(onoff);
@@ -325,11 +332,11 @@ public class ControlPanel extends JPanel {
 		treeLayout.setEnabled(onoff);
 		radialPlainLayout.setEnabled(onoff);
 		//radialSmartLayout.setEnabled(onoff);
-		randomLayout.setEnabled(onoff);			
-		chronoOrder.setEnabled(onoff);	
+		randomLayout.setEnabled(onoff);
+		chronoOrder.setEnabled(onoff);
 		leftOrder.setEnabled(onoff);
-		rightOrder.setEnabled(onoff);	
-		middleFullOrder.setEnabled(onoff);	
+		rightOrder.setEnabled(onoff);
+		middleFullOrder.setEnabled(onoff);
 		middleEmptyOrder.setEnabled(onoff);
 	}
 

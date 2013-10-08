@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 import controller.MouseControl;
 import model.Frame;
 import model.Line;
-import model.Model;
 import model.Point;
 import model.Timeline;
 
@@ -21,7 +20,8 @@ import model.Timeline;
 public class GraphPanel extends JPanel{
 
 	private static final long serialVersionUID = 1L;
-	
+
+    private Animator animator;
 	private GraphPanel thisGraphPanel = this;
 	private ControlPanel controlPanel;
 	private AnimationPanel animationPanel;
@@ -32,16 +32,13 @@ public class GraphPanel extends JPanel{
 	private int nodeSize;
 	private int nodeVertDist;
 
-    private Thread animationThread;
+    /**
+     * The index of the current animation type.
+     */
 	private int animIndex;
 	private Timeline timeline;
-	private ArrayList<Frame> frames;
 	private Frame currentFrame;
 	private int animStepsBtwnKeyframes = 15;
-	private int currentAnimStep;
-	private boolean inAnimation = false;
-	private boolean animationAllowed = true;
-	private int animSpeed = 33;
 	
 	private boolean showNodeID = false;
 	private boolean showHelplines = false;
@@ -55,21 +52,15 @@ public class GraphPanel extends JPanel{
 		MouseControl mc = new MouseControl(this);
 		addMouseListener(mc);
 	}
+
+    public void setAnimator(Animator animator) {
+        this.animator = animator;
+    }
 	
 	//TODO this definitely needs a slider or some cool smart self-checking adaption...
 	public void setOffset(int xOffset, int yOffset){
 		this.xOffset = xOffset;
 		this.yOffset = yOffset;
-	}
-	
-	public void setAnimSpeed(int animSpeed){
-		this.animSpeed = animSpeed;	
-		if(!inAnimation)
-			showTimeline();
-	}
-	
-	public int getAnimSpeed(){
-		return animSpeed;
 	}
 	
 	public void setControlAndSliderPanel(ControlPanel controlPanel, AnimationPanel animationPanel) {
@@ -91,27 +82,27 @@ public class GraphPanel extends JPanel{
 //	}
 	
 	public void handleMouseRelease(int clickX, int clickY, int releaseX, int releaseY, boolean leftButton){		
-		//System.out.println("clickX: " + clickX + "  clickY: " + clickY + "  releaseX: " + releaseX + "  releaseY: " + releaseY);	
-		if(!inAnimation)	
+		//System.out.println("clickX: " + clickX + "  clickY: " + clickY + "  releaseX: " + releaseX + "  releaseY: " + releaseY);
+		if(animator.isIdle())
 			if(currentFrame != null){
-						
+
 				Point clickedPoint = null;
 				Point releasedPoint = null;
 				Point closestPointToRelease = null;
 				double closest = 1000;
 				boolean rightFromThis = true;
-				
+
 				for(Point point : currentFrame.points){
 					double boundaryLEFT = point.x + xOffset - nodeSize / 2;
 					double boundaryRIGHT = boundaryLEFT + nodeSize;
 					double boundaryUP = point.y + yOffset - nodeSize / 2;
-					double boundaryDOWN = boundaryUP + nodeSize;	
+					double boundaryDOWN = boundaryUP + nodeSize;
 					if(clickX > boundaryLEFT && clickX < boundaryRIGHT && clickY > boundaryUP  && clickY < boundaryDOWN)
-						clickedPoint = point;		
+						clickedPoint = point;
 					if(releaseX > boundaryLEFT && releaseX < boundaryRIGHT && releaseY > boundaryUP  && releaseY < boundaryDOWN)
-						releasedPoint = point;	
+						releasedPoint = point;
 				}
-				
+
 				if(clickedPoint != null && clickedPoint != releasedPoint){
 					for(Point point : currentFrame.points)
 						if(point != clickedPoint){
@@ -121,20 +112,20 @@ public class GraphPanel extends JPanel{
 								closestPointToRelease = point;
 								rightFromThis = releaseX > (point.x + xOffset);
 							}
-					}		
+					}
 				}
 				if(clickedPoint != null){
 					if(clickedPoint == releasedPoint)
-						controlPanel.handleNodeClicked(clickedPoint.nodeID, leftButton);	
-					else				
+						controlPanel.handleNodeClicked(clickedPoint.nodeID, leftButton);
+					else
 						if(leftButton && closestPointToRelease != null)
 							if(controlPanel.getHorizOrderIndex() == 0){
-								controlPanel.handleNodeClicked(clickedPoint.nodeID, closestPointToRelease.nodeID, rightFromThis);	
+								controlPanel.handleNodeClicked(clickedPoint.nodeID, closestPointToRelease.nodeID, rightFromThis);
 								System.out.println("wanting to add a node under parent: " + clickedPoint.nodeID + " thats close to this child: " + closestPointToRelease.nodeID + " on the right side: " + rightFromThis);
 							}
 							else
 								JOptionPane.showMessageDialog(null, "placing children at specific places only makes sense when the order-index is chronological"
-										+ ", all other options overwrite the horizontal order anyway", "wrong order-modus", JOptionPane.PLAIN_MESSAGE);	
+										+ ", all other options overwrite the horizontal order anyway", "wrong order-modus", JOptionPane.PLAIN_MESSAGE);
 				}
 			}
 	}	
@@ -144,6 +135,10 @@ public class GraphPanel extends JPanel{
 		this.timeline = timeline;
 		showTimeline();
 	}
+
+    public void setCurrentFrame(Frame currentFrame) {
+        this.currentFrame = currentFrame;
+    }
 	
 	public void setAnimIndex(int index) {
 		animIndex = index;
@@ -157,60 +152,20 @@ public class GraphPanel extends JPanel{
 			repaint();
 		}
 		else{
-			frames = timeline.placeStepsBtwnKeyframes(animIndex, animStepsBtwnKeyframes);
+			ArrayList<Frame> frames = timeline.placeStepsBtwnKeyframes(animIndex, animStepsBtwnKeyframes);
 			System.out.println("size of frames: " + frames.size());
-			currentAnimStep = 0;
-			inAnimation = true;
-			animationAllowed = true;
-			controlPanel.enableSwitch(false);
-			animationPanel.enableSwitch(false);
-			animationThread = new Thread(new Runnable(){public void run() {
-	            new Animator(thisGraphPanel).triggerUpdating(frames.size()); 
-	        }});
-            animationThread.start();
-		}
-	}
-
-	public void pauseAnimation(){
-		animationAllowed = false;
-	}
-	
-	public boolean getAnimationAllowed(){
-		return animationAllowed;
-	}
-	
-	
-	public void continueAnimation(){
-		animationAllowed = true;
-		new Thread(new Runnable(){public void run() { 
-            new Animator(thisGraphPanel).triggerUpdating(frames.size() - currentAnimStep); 
-        }}).start(); 
-	}
-	
-	public void stopAnimation(){
-        if (animationThread != null) {
-            animationThread.interrupt();
-        }
-		animationAllowed = false;
-		currentFrame = frames.get(frames.size() - 1);
-		repaint();
-		animationFinished();
-	}
-	
-	public void updateAnimation(){
-		if(animationAllowed){
-			currentFrame = frames.get(currentAnimStep);
-			currentAnimStep ++;
+            animationPanel.enableSwitch(false);
+            controlPanel.enableSwitch(false);
+			animator.setFrames(frames);
+            animator.proceed();
 		}
 	}
 	
 	public void animationFinished(){
-		inAnimation = false;
-		controlPanel.enableSwitch(true);
-		animationPanel.enableSwitch(true);
+        controlPanel.enableSwitch(true);
+        animationPanel.enableSwitch(true);
 		System.out.println("animation finished");
 	}
-	
 
 	//double buffer setup via youtu.be/4T3WJEH7zrc
 	public void paint(Graphics g){
@@ -280,13 +235,13 @@ public class GraphPanel extends JPanel{
 //	int sourceY = (int) edge.getSource().getY() + yOffset;
 //	int targetX = (int) edge.getTarget().getX() + xOffset;
 //	int targetY = (int) edge.getTarget().getY() + yOffset;
-//	g.drawLine(sourceX, sourceY, targetX, targetY);			
-//}			
+//	g.drawLine(sourceX, sourceY, targetX, targetY);
+//}
 ////nodes
 //g.setColor(new Color(0, 0, 128));
 //for(Node node : graph.getNodes()){
 //	int x = (int) (node.getX() + xOffset - nodeSize / 2);
-//	int y = (int) (node.getY() + yOffset - nodeSize / 2);		
+//	int y = (int) (node.getY() + yOffset - nodeSize / 2);
 //	g.fillOval(x, y, nodeSize, nodeSize);
 ////	g.setColor(Color.BLACK);
 ////	g.drawString(node.getValue(), x, y + 10);

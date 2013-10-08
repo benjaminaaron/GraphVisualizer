@@ -23,6 +23,7 @@ public class AnimationPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private Model model;
+    private Animator animator;
 	private GraphPanel graphPanel;
 	
 	private JButton pauseButton, stopButton;
@@ -34,13 +35,19 @@ public class AnimationPanel extends JPanel {
 	private int nodeSize = 20;
 	private int nodeVertDist = 50;
 	private int nodeMinHorizDist = 30;
-	
+
+    /**
+     * The index of the current animation type.
+     */
 	private int animIndex = 1;
-	private boolean notPaused = true;
-	
-	public void setModel(Model model) {
+
+    public void setModel(Model model) {
 		this.model = model;
 	}
+
+    public void setAnimator(Animator animator) {
+        this.animator = animator;
+    }
 	
 	public int getAnimIndex() {
 		return animIndex;
@@ -132,7 +139,7 @@ public class AnimationPanel extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				if(stopButton.isEnabled())
-					stopAnimation();
+					animator.finish();
 			}
 		});	
 		add(stopButton);
@@ -208,8 +215,6 @@ public class AnimationPanel extends JPanel {
 	
 	
 	private void changeParams(){
-        stopAnimation();
-
         nodeSize = nodeSizeSlider.getValue();
         nodeVertDist = nodeVertDistSlider.getValue();
         nodeMinHorizDist = nodeMinHorizDistSlider.getValue();
@@ -224,7 +229,7 @@ public class AnimationPanel extends JPanel {
     }
 	
 	private void changeAnimSpeed() {
-		graphPanel.setAnimSpeed(animSpeedSlider.getValue());
+		animator.setSpeed(animSpeedSlider.getValue());
 	}
 	
 	
@@ -237,21 +242,14 @@ public class AnimationPanel extends JPanel {
 	}
 	
 	private void togglePauseContinue(){
-		if(notPaused){
-			notPaused = false;
-			pauseButton.setText("continue");
-			graphPanel.pauseAnimation();
+		if(animator.isPaused()){
+            pauseButton.setText("pause");
+            animator.proceed();
 		}
 		else{
-			notPaused = true;
-			pauseButton.setText("pause");
-			graphPanel.continueAnimation();
+            pauseButton.setText("continue");
+            animator.pause();
 		}	
-	}
-	
-	
-	private void stopAnimation(){
-		graphPanel.stopAnimation();
 	}
 	
 	private void setAnimIndex(int index){
@@ -267,20 +265,20 @@ public class AnimationPanel extends JPanel {
 	public void enableSwitch(boolean onoff) {
 		pauseButton.setEnabled(!onoff);
 		stopButton.setEnabled(!onoff);
-		
+
 		animLabel.setEnabled(onoff);
 		noAnim.setEnabled(onoff);
 		shortAnim.setEnabled(onoff);
-		levelByLevelAnim.setEnabled(onoff);	
-		nodeByNodeAnim.setEnabled(onoff);	
-		
-		nodeSizeSlider.setEnabled(onoff); 
-		nodeVertDistSlider.setEnabled(onoff); 
-		nodeMinHorizDistSlider.setEnabled(onoff); 
+		levelByLevelAnim.setEnabled(onoff);
+		nodeByNodeAnim.setEnabled(onoff);
+
+		nodeSizeSlider.setEnabled(onoff);
+		nodeVertDistSlider.setEnabled(onoff);
+		nodeMinHorizDistSlider.setEnabled(onoff);
 		nodeSizeLabel.setEnabled(onoff);
 		nodeVertDistLabel.setEnabled(onoff);
 		nodeMinHorizDistLabel.setEnabled(onoff);
-		
+
 		if(!onoff)
 			showHelplinesCheckbox.setEnabled(false);
 		if(onoff && animIndex == 3)
@@ -291,9 +289,9 @@ public class AnimationPanel extends JPanel {
 
 
 
-	
-	
-	
-	
-	
+
+
+
+
+
 }
