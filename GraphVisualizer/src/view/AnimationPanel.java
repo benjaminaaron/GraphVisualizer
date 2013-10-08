@@ -207,23 +207,21 @@ public class AnimationPanel extends JPanel {
 	}
 	
 	
-	private void changeParams(){	
-		if(noAnim.isSelected()){
-			nodeSize = nodeSizeSlider.getValue();
-			nodeVertDist = nodeVertDistSlider.getValue();
-			nodeMinHorizDist = nodeMinHorizDistSlider.getValue();
-			
-			nodeSizeLabel.setText("nodeSize: " + nodeSize);
-			nodeVertDistLabel.setText("nodeVertDist: " + nodeVertDist); 
-			nodeMinHorizDistLabel.setText("nodeMinHorizDist: " + nodeMinHorizDist);	
-			
-			model.changeNodeParams(nodeSize, nodeVertDist, nodeMinHorizDist);
-			graphPanel.setNodeSizeAndNodeVertDist(nodeSize, nodeVertDist);
-			graphPanel.setTimeline(model.getTimeline());
-		}
-		else
-			JOptionPane.showMessageDialog(null, "can't change parameters unless in animation modus <none>", "wrong animation modus", JOptionPane.PLAIN_MESSAGE);	
-	}
+	private void changeParams(){
+        stopAnimation();
+
+        nodeSize = nodeSizeSlider.getValue();
+        nodeVertDist = nodeVertDistSlider.getValue();
+        nodeMinHorizDist = nodeMinHorizDistSlider.getValue();
+
+        nodeSizeLabel.setText("nodeSize: " + nodeSize);
+        nodeVertDistLabel.setText("nodeVertDist: " + nodeVertDist);
+        nodeMinHorizDistLabel.setText("nodeMinHorizDist: " + nodeMinHorizDist);
+
+        model.changeNodeParams(nodeSize, nodeVertDist, nodeMinHorizDist);
+        graphPanel.setNodeSizeAndNodeVertDist(nodeSize, nodeVertDist);
+        graphPanel.setTimeline(model.getTimeline());
+    }
 	
 	private void changeAnimSpeed() {
 		graphPanel.setAnimSpeed(animSpeedSlider.getValue());

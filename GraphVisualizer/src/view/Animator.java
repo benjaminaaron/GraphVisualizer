@@ -9,7 +9,9 @@ public class Animator {
 	}
 	
 	public void triggerUpdating(int animSteps){							
-		while(animSteps > 0 && graphPanel.getAnimationAllowed()){	
+		while(animSteps > 0 && graphPanel.getAnimationAllowed() &&
+              !Thread.currentThread().isInterrupted()
+        ){
 			try {
 				Thread.sleep(graphPanel.getAnimSpeed());
 			} catch (InterruptedException e) {
@@ -19,7 +21,7 @@ public class Animator {
 			graphPanel.repaint();
 			animSteps --;			
 		}	
-		if(animSteps == 0)
+		if(animSteps == 0 || Thread.currentThread().isInterrupted())
 			graphPanel.animationFinished();			
 	}
 }

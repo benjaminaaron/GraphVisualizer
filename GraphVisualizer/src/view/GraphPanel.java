@@ -31,7 +31,8 @@ public class GraphPanel extends JPanel{
 	
 	private int nodeSize;
 	private int nodeVertDist;
-	
+
+    private Thread animationThread;
 	private int animIndex;
 	private Timeline timeline;
 	private ArrayList<Frame> frames;
@@ -163,9 +164,10 @@ public class GraphPanel extends JPanel{
 			animationAllowed = true;
 			controlPanel.enableSwitch(false);
 			animationPanel.enableSwitch(false);
-			new Thread(new Runnable(){public void run() { 
+			animationThread = new Thread(new Runnable(){public void run() {
 	            new Animator(thisGraphPanel).triggerUpdating(frames.size()); 
-	        }}).start(); 
+	        }});
+            animationThread.start();
 		}
 	}
 
@@ -186,6 +188,9 @@ public class GraphPanel extends JPanel{
 	}
 	
 	public void stopAnimation(){
+        if (animationThread != null) {
+            animationThread.interrupt();
+        }
 		animationAllowed = false;
 		currentFrame = frames.get(frames.size() - 1);
 		repaint();
