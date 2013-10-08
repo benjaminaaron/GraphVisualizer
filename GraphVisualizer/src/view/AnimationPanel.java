@@ -265,24 +265,6 @@ public class AnimationPanel extends JPanel {
 	public void enableSwitch(boolean onoff) {
 		pauseButton.setEnabled(!onoff);
 		stopButton.setEnabled(!onoff);
-
-		animLabel.setEnabled(onoff);
-		noAnim.setEnabled(onoff);
-		shortAnim.setEnabled(onoff);
-		levelByLevelAnim.setEnabled(onoff);
-		nodeByNodeAnim.setEnabled(onoff);
-
-		nodeSizeSlider.setEnabled(onoff);
-		nodeVertDistSlider.setEnabled(onoff);
-		nodeMinHorizDistSlider.setEnabled(onoff);
-		nodeSizeLabel.setEnabled(onoff);
-		nodeVertDistLabel.setEnabled(onoff);
-		nodeMinHorizDistLabel.setEnabled(onoff);
-
-		if(!onoff)
-			showHelplinesCheckbox.setEnabled(false);
-		if(onoff && animIndex == 3)
-			showHelplinesCheckbox.setEnabled(true);
 	}
 
 

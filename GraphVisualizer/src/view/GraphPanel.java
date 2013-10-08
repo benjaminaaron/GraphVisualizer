@@ -155,14 +155,12 @@ public class GraphPanel extends JPanel{
 			ArrayList<Frame> frames = timeline.placeStepsBtwnKeyframes(animIndex, animStepsBtwnKeyframes);
 			System.out.println("size of frames: " + frames.size());
             animationPanel.enableSwitch(false);
-            controlPanel.enableSwitch(false);
 			animator.setFrames(frames);
             animator.proceed();
 		}
 	}
 	
 	public void animationFinished(){
-        controlPanel.enableSwitch(true);
         animationPanel.enableSwitch(true);
 		System.out.println("animation finished");
 	}

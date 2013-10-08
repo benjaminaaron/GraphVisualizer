@@ -301,43 +301,20 @@ public class ControlPanel extends JPanel {
 		model.setLayoutAlgorithm(layoutAlgorithm);
 		graphPanel.setTimeline(model.getTimeline());
 	}
-	
-	private void setHorizOrderIndex(int index){
-		horizOrderIndex = index;
-		model.setOrderIndex(index);
-		graphPanel.setTimeline(model.getTimeline());
-	}
-	
-	private void exportGraph() throws FileNotFoundException{
-		String filename = model.exportGraph();		
-		JOptionPane.showMessageDialog(null, "exported as file: \n" + filename, "export successful", JOptionPane.PLAIN_MESSAGE);
-	}
-	
-	private void importGraph() throws IOException{		
-		model.loadImportedGraph(Importer.convertGraphmlFileToGraph());
-		graphPanel.setTimeline(model.getTimeline());
-	}
 
-	public void enableSwitch(boolean onoff){
-		//graphLabel.setEnabled(onoff);
-		layoutLabel.setEnabled(onoff);
-		orderLabel.setEnabled(onoff);
-		newButton.setEnabled(onoff);
-		sampleButton.setEnabled(onoff);
-		importButton.setEnabled(onoff);
-		exportButton.setEnabled(onoff);
-		helpButton.setEnabled(onoff);
-		consoleShowButton.setEnabled(onoff);
-		basicLayout.setEnabled(onoff);
-		treeLayout.setEnabled(onoff);
-		radialPlainLayout.setEnabled(onoff);
-		//radialSmartLayout.setEnabled(onoff);
-		randomLayout.setEnabled(onoff);
-		chronoOrder.setEnabled(onoff);
-		leftOrder.setEnabled(onoff);
-		rightOrder.setEnabled(onoff);
-		middleFullOrder.setEnabled(onoff);
-		middleEmptyOrder.setEnabled(onoff);
-	}
+    private void setHorizOrderIndex(int index){
+        horizOrderIndex = index;
+        model.setOrderIndex(index);
+        graphPanel.setTimeline(model.getTimeline());
+    }
 
+    private void exportGraph() throws FileNotFoundException{
+        String filename = model.exportGraph();
+        JOptionPane.showMessageDialog(null, "exported as file: \n" + filename, "export successful", JOptionPane.PLAIN_MESSAGE);
+    }
+
+    private void importGraph() throws IOException{
+        model.loadImportedGraph(Importer.convertGraphmlFileToGraph());
+        graphPanel.setTimeline(model.getTimeline());
+    }
 }
