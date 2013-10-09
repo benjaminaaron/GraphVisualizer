@@ -11,7 +11,7 @@ public class RadialPlainLayout implements LayoutInterface {
 		Node rootnode = graph.getRootnode();
 
 		rootnode.setCorridor(0, 360);
-		rootnode.placingForRadialPlain(nodeVertDist); //decentralized... sending an impulse into rootnode for it to pass it downwards. awesome strategy... apply elsewhere? everywhere??
+		rootnode.placingForRadialPlain(nodeVertDist + nodeSize); //decentralized... sending an impulse into rootnode for it to pass it downwards. awesome strategy... apply elsewhere? everywhere??
 
 		//faking the animation for levelwise and nodewise animation AFTER the actual calculation was done in the nodes themselves :) why? because otherwise Node would need to know Graph
 		//in order to do the "snapshots" (=new Keyframe for levewise or nodewise) and that doesn't feel elegant at all

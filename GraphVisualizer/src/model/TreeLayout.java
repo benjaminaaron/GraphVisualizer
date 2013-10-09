@@ -23,7 +23,7 @@ public class TreeLayout implements LayoutInterface {
 		currentLOWERLevelNodes = graph.getNodesAtLevel(lowLevelVertical);
 		
 		//placeBottomLevelWithMinDist
-		double bottomY = lowLevelVertical * nodeVertDist;
+		double bottomY = lowLevelVertical * (nodeVertDist + nodeSize);
 		double blockWidth = currentLOWERLevelNodes.size() * nodeSize + (currentLOWERLevelNodes.size() - 1) * nodeMinHorizDist - nodeSize;	
 		double x = - blockWidth / 2;
 		for(Node node : currentLOWERLevelNodes){
@@ -34,7 +34,7 @@ public class TreeLayout implements LayoutInterface {
 		
 		ArrayList<Node> currentUPPERLevelNodes = new ArrayList<>();
 		currentUPPERLevelNodes = graph.getNodesAtLevel(lowLevelVertical - 1);
-		double upperY = (lowLevelVertical - 1) * nodeVertDist;	
+		double upperY = (lowLevelVertical - 1) * (nodeVertDist + nodeSize);
 		
 		
 		while(currentUPPERLevelNodes != null){
@@ -201,7 +201,7 @@ public class TreeLayout implements LayoutInterface {
 			lowLevelVertical --;
 			currentLOWERLevelNodes = graph.getNodesAtLevel(lowLevelVertical);
 			currentUPPERLevelNodes = graph.getNodesAtLevel(lowLevelVertical - 1);
-			upperY = (lowLevelVertical - 1) * nodeVertDist;	
+			upperY = (lowLevelVertical - 1) * (nodeVertDist + nodeSize);
 			graph.addKeyframeLevelwise();
 		}
 		
