@@ -5,16 +5,16 @@ import model.Frame;
 import java.util.ArrayList;
 
 public class Animator extends Thread {
-	
-	private GraphPanel graphPanel;
+
+    private GraphPanel graphPanel;
     private ArrayList<Frame> frames = new ArrayList<>();
     private int currentAnimationStep = 0;
     private boolean isPaused = false;
     private int speed = 33;
 
-	public Animator() {
+    public Animator() {
 
-	}
+    }
 
     public void setGraphPanel(GraphPanel graphPanel) {
         this.graphPanel = graphPanel;
@@ -80,9 +80,10 @@ public class Animator extends Thread {
         }
     }
 
-    @Override public void run() {
-		while(!isInterrupted()){
-			try {
+    @Override
+    public void run() {
+        while (!isInterrupted()) {
+            try {
                 while (isPaused || isIdle()) {
                     synchronized (this) {
                         wait();
@@ -104,5 +105,5 @@ public class Animator extends Thread {
                 graphPanel.repaint();
             }
         }
-	}
+    }
 }

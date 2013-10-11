@@ -2,38 +2,38 @@ package model;
 
 public class SampleGraph {
 
-	
-	public static Graph getSampleGraph(){
-		Graph sample = new Graph();
-		
-		Node rootnode = new Node("", "rootnode");
-		sample.addNode(rootnode);
-		
-		Node level1a = new Node("", "1a");
-		sample.addNode(level1a);
-		sample.addEdge(rootnode,  level1a);		
-		Node level1b = new Node("", "1b");
-		sample.addNode(level1b);
-		sample.addEdge(rootnode,  level1b);	
-		Node level1c = new Node("", "1c");
-		sample.addNode(level1c);
-		sample.addEdge(rootnode,  level1c);
-		
-		Node level2a = new Node("", "2a");
-		sample.addNode(level2a);
-		sample.addEdge(level1a, level2a);
-		Node level2b = new Node("", "2b");
-		sample.addNode(level2b);
-		sample.addEdge(level1a, level2b);
-		
-		Node level3a = new Node("", "3a");
-		sample.addNode(level3a);
-		sample.addEdge(level2b, level3a);
-			
-		
-		return sample;	
-		
-		
+
+    public static Graph getSampleGraph() {
+        Graph sample = new Graph();
+
+        Node rootnode = new Node("", "rootnode");
+        sample.addNode(rootnode);
+
+        Node level1a = new Node("", "1a");
+        sample.addNode(level1a);
+        sample.addEdge(rootnode, level1a);
+        Node level1b = new Node("", "1b");
+        sample.addNode(level1b);
+        sample.addEdge(rootnode, level1b);
+        Node level1c = new Node("", "1c");
+        sample.addNode(level1c);
+        sample.addEdge(rootnode, level1c);
+
+        Node level2a = new Node("", "2a");
+        sample.addNode(level2a);
+        sample.addEdge(level1a, level2a);
+        Node level2b = new Node("", "2b");
+        sample.addNode(level2b);
+        sample.addEdge(level1a, level2b);
+
+        Node level3a = new Node("", "3a");
+        sample.addNode(level3a);
+        sample.addEdge(level2b, level3a);
+
+
+        return sample;
+
+
 //		String rootID = sample.addNode("rootnode");
 //		
 //		String level1aID = sample.addNode("level1A");		
@@ -85,5 +85,5 @@ public class SampleGraph {
 //		
 //		String level3fID = sample.addNode("level3F");
 //		sample.addEdge(level2gID, level3fID);
-	}
+    }
 }
