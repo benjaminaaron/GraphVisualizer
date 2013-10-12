@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import controller.MouseControl;
+import controller.MouseMotionControl;
 import model.Frame;
 import model.Line;
 import model.Point;
@@ -27,7 +28,7 @@ public class GraphPanel extends JPanel {
     private AnimationPanel animationPanel;
 
     private int xOffset = 650;
-    private int yOffset = 80;
+    private int yOffset = 200;//80;
 
     private int nodeSize;
     private int nodeVertDist;
@@ -40,6 +41,8 @@ public class GraphPanel extends JPanel {
     private Frame currentFrame;
     private int animStepsBtwnKeyframes = 15;
 
+    private Point mouseOverPoint = null;
+
     private boolean showNodeID = false;
     private boolean showHelplines = false;
 
@@ -51,6 +54,9 @@ public class GraphPanel extends JPanel {
     public GraphPanel() {
         MouseControl mc = new MouseControl(this);
         addMouseListener(mc);
+
+        MouseMotionControl mmc = new MouseMotionControl(this);
+        addMouseMotionListener(mmc);
     }
 
     public void setAnimator(Animator animator) {
@@ -81,46 +87,59 @@ public class GraphPanel extends JPanel {
 //		xOffset = getWidth() / 2;
 //	}
 
+    public void handleMousePos(int mouseX, int mouseY) {
+        if(animator.isIdle() && currentFrame != null){
+            mouseOverPoint = coordsAreOnPoint(mouseX, mouseY);
+            repaint();
+        }
+    }
+
+    private Point coordsAreOnPoint(int x, int y){
+        //point is being treated as rectangular... maybe better as the actual circles they are?
+        for (Point point : currentFrame.points) {
+            double boundaryLEFT = point.x + xOffset - nodeSize / 2;
+            double boundaryRIGHT = boundaryLEFT + nodeSize;
+            double boundaryUP = point.y + yOffset - nodeSize / 2;
+            double boundaryDOWN = boundaryUP + nodeSize;
+            if (x > boundaryLEFT && x < boundaryRIGHT && y > boundaryUP && y < boundaryDOWN)
+                return point;
+        }
+        return null;
+    }
+
+
     public void handleMouseRelease(int clickX, int clickY, int releaseX, int releaseY, boolean leftButton) {
+        mouseOverPoint = null;
         //System.out.println("clickX: " + clickX + "  clickY: " + clickY + "  releaseX: " + releaseX + "  releaseY: " + releaseY);
-        if (animator.isIdle()) {
-            if (currentFrame != null) {
+        if (animator.isIdle() && currentFrame != null) {
 
-                Point clickedPoint = null;
-                Point releasedPoint = null;
-                Point closestPointToRelease = null;
-                double closest = 1000;
-                boolean rightFromThis = true;
+            Point clickedPoint = coordsAreOnPoint(clickX, clickY);
+            Point releasedPoint = coordsAreOnPoint(releaseX, releaseY);
 
+            Point closestPointToRelease = null;
+            double closest = 1000;
+            boolean rightFromThis = true;
+
+            //jesus... what's all the mess in the rest of this method from here downwards?? i am sure that can be simplified :)
+
+            if (clickedPoint != null && clickedPoint != releasedPoint) {
                 for (Point point : currentFrame.points) {
-                    double boundaryLEFT = point.x + xOffset - nodeSize / 2;
-                    double boundaryRIGHT = boundaryLEFT + nodeSize;
-                    double boundaryUP = point.y + yOffset - nodeSize / 2;
-                    double boundaryDOWN = boundaryUP + nodeSize;
-                    if (clickX > boundaryLEFT && clickX < boundaryRIGHT && clickY > boundaryUP && clickY < boundaryDOWN) {
-                        clickedPoint = point;
-                    }
-                    if (releaseX > boundaryLEFT && releaseX < boundaryRIGHT && releaseY > boundaryUP && releaseY < boundaryDOWN) {
-                        releasedPoint = point;
-                    }
-                }
-
-                if (clickedPoint != null && clickedPoint != releasedPoint) {
-                    for (Point point : currentFrame.points) {
-                        if (point != clickedPoint) {
-                            double pointDistToRelease = Math.sqrt(Math.pow(releaseX - (point.x + xOffset), 2) + Math.pow(releaseY - (point.y + yOffset), 2));
-                            if (closest > pointDistToRelease) {
-                                closest = pointDistToRelease;
-                                closestPointToRelease = point;
-                                rightFromThis = releaseX > (point.x + xOffset);
-                            }
+                    if (point != clickedPoint) {
+                        double pointDistToRelease = Math.sqrt(Math.pow(releaseX - (point.x + xOffset), 2) + Math.pow(releaseY - (point.y + yOffset), 2));
+                        if (closest > pointDistToRelease) {
+                            closest = pointDistToRelease;
+                            closestPointToRelease = point;
+                            rightFromThis = releaseX > (point.x + xOffset);
                         }
                     }
                 }
-                if (clickedPoint != null) {
-                    if (clickedPoint == releasedPoint) {
-                        controlPanel.handleNodeClicked(clickedPoint.nodeID, leftButton);
-                    } else if (leftButton && closestPointToRelease != null) {
+            }
+
+            if (clickedPoint != null) {
+                if (clickedPoint == releasedPoint)
+                    controlPanel.handleNodeClicked(clickedPoint.nodeID, leftButton);
+                else
+                    if (leftButton && closestPointToRelease != null) {
                         if (controlPanel.getHorizOrderIndex() == 0) {
                             controlPanel.handleNodeClicked(clickedPoint.nodeID, closestPointToRelease.nodeID, rightFromThis);
                             System.out.println("wanting to add a node under parent: " + clickedPoint.nodeID + " thats close to this child: " + closestPointToRelease.nodeID + " on the right side: " + rightFromThis);
@@ -129,7 +148,6 @@ public class GraphPanel extends JPanel {
                                     + ", all other options overwrite the horizontal order anyway", "wrong order-modus", JOptionPane.PLAIN_MESSAGE);
                         }
                     }
-                }
             }
         }
     }
@@ -202,10 +220,24 @@ public class GraphPanel extends JPanel {
             g2d.fillOval(x - nodeSize / 2, y - nodeSize / 2, nodeSize, nodeSize);
 
             if (showNodeID) {
-                g.setColor(Color.GRAY);
-                g.drawString(point.nodeID, x - 45, y + 25);
+                g2d.setColor(Color.GRAY);
+                g2d.drawString(point.nodeID, x - 45, y + 25);
+                g2d.setColor(new Color(0, 0, 128));
             }
         }
+
+        if(mouseOverPoint != null){
+            g2d.setColor(new Color(245, 245, 220));
+            int x = (int) (mouseOverPoint.x + xOffset);
+            int y = (int) (mouseOverPoint.y + yOffset);
+            g2d.fillRect(x - 50, y - 30, 100, 20);
+            g2d.setColor(new Color(193, 154, 107));
+            g2d.drawRect(x - 50, y - 30, 100, 20);
+            g2d.setColor(Color.GRAY);
+            g2d.drawString(mouseOverPoint.nodeID, x - 45, y - 16);
+        }
+
+
         if (showHelplines) {
             g2d.setColor(Color.RED);
             g2d.setStroke(new BasicStroke(3));

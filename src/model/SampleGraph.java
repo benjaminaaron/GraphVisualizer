@@ -9,7 +9,49 @@ public class SampleGraph {
         Node rootnode = new Node("", "rootnode");
         sample.addNode(rootnode);
 
-        Node level1a = new Node("", "1a");
+        Node A1 = new Node("", "");
+        sample.addNode(A1);
+        sample.addEdge(rootnode, A1);
+
+        Node B1 = new Node("", "");
+        sample.addNode(B1);
+        sample.addEdge(A1, B1);
+        Node B2 = new Node("", "");
+        sample.addNode(B2);
+        sample.addEdge(A1, B2);
+        Node B3 = new Node("", "");
+        sample.addNode(B3);
+        sample.addEdge(A1, B3);
+        Node B4 = new Node("", "");
+        sample.addNode(B4);
+        sample.addEdge(A1, B4);
+        Node B5 = new Node("", "");
+        sample.addNode(B5);
+        sample.addEdge(A1, B5);
+        Node B6 = new Node("", "");
+        sample.addNode(B6);
+        sample.addEdge(A1, B6);
+
+        Node A2 = new Node("", "");
+        sample.addNode(A2);
+        sample.addEdge(rootnode, A2);
+
+        Node C1 = new Node("", "");
+        sample.addNode(C1);
+        sample.addEdge(A2, C1);
+        Node C2 = new Node("", "");
+        sample.addNode(C2);
+        sample.addEdge(A2, C2);
+        Node C3 = new Node("", "");
+        sample.addNode(C3);
+        sample.addEdge(A2, C3);
+
+        Node A3 = new Node("", "");
+        sample.addNode(A3);
+        sample.addEdge(rootnode, A3);
+
+
+ /*       Node level1a = new Node("", "1a");
         sample.addNode(level1a);
         sample.addEdge(rootnode, level1a);
         Node level1b = new Node("", "1b");
@@ -29,9 +71,13 @@ public class SampleGraph {
         Node level3a = new Node("", "3a");
         sample.addNode(level3a);
         sample.addEdge(level2b, level3a);
-
+ */
 
         return sample;
+
+
+
+
 
 
 //		String rootID = sample.addNode("rootnode");

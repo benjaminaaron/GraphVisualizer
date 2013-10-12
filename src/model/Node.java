@@ -21,6 +21,7 @@ public class Node {
     private double angle = 0;
     private double corridorStart, corridorEnd, corridorSpanning;
 
+
     public void setCorridor(double corridorStart, double corridorEnd) {
         this.corridorStart = corridorStart;
         this.corridorEnd = corridorEnd;
@@ -40,7 +41,6 @@ public class Node {
     }
 
     public void placingForRadialPlain(int nodeVertDist) {
-
         double deltaAngle = corridorSpanning / children.size();
         double lastCorridorBorder = corridorStart;
         double nextCorridorBorder = lastCorridorBorder + deltaAngle;
@@ -48,7 +48,7 @@ public class Node {
         int i = 0;
         for (Node child : children) {
             double newAngle = corridorStart + deltaAngle / 2 + deltaAngle * i;
-            child.setAngle(nodeVertDist, newAngle);
+            child.setAngle(newAngle, nodeVertDist);
             child.setCorridor(lastCorridorBorder, nextCorridorBorder);
 
             System.out.println("just gave " + child.getID() + " the angle: " + Math.round(newAngle) + " and the corridor from: " + Math.round(lastCorridorBorder) + " to: " + Math.round(nextCorridorBorder));
@@ -60,17 +60,15 @@ public class Node {
         }
     }
 
-
-    public void setAngle(int nodeVertDist, double angle) {
+    public void setAngle(double angle, int nodeVertDist) {
         this.angle = angle;
-        double rad = (angle / 180) * Math.PI; //conversion into radiants, could just as well do it in rad only, but for understanding its better in degrees :) and actually has sort of higher precision
-        setPos(vertical * nodeVertDist * Math.cos(rad), -vertical * nodeVertDist * Math.sin(rad));
+        double rad = Math.toRadians(angle); //(angle / 180) * Math.PI; //conversion into radiants, could just as well do it in rad only, but for understanding its better in degrees :) and actually has sort of higher precision
+        setPos(vertical * nodeVertDist * Math.cos(rad), vertical * nodeVertDist * Math.sin(rad));
     }
 
     public double getAngle() {
         return angle;
     }
-
 
     public void resetNode() {
         //but not pos! in order to allow the short-animation to function nicely
@@ -85,11 +83,6 @@ public class Node {
         this.x = x;
         this.y = y;
     }
-
-//	public void putMyChildrenAtMyPos() {
-//		for(Node child : children)
-//			child.setPos(x, y);
-//	}
 
     public Point getPoint() {
         return new Point(ID, x, y);

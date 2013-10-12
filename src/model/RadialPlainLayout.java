@@ -7,9 +7,9 @@ public class RadialPlainLayout implements LayoutInterface {
         Node rootnode = graph.getRootnode();
 
         rootnode.setCorridor(0, 360);
-        rootnode.placingForRadialPlain(nodeVertDist + nodeSize); //decentralized... sending an impulse into rootnode for it to pass it downwards. awesome strategy... apply elsewhere? everywhere??
+        rootnode.placingForRadialPlain(nodeVertDist);// + nodeSize); //decentralized... sending an impulse into rootnode for it to pass it downwards. awesome strategy... apply elsewhere? everywhere??
 
-        return new AnimationPostproduction().createNodeAndLevelwiseBasedOnLevels(graph);
+        return new AnimationProduction().createNodeAndLevelwiseBasedOnLevels(graph);
     }
 }
 

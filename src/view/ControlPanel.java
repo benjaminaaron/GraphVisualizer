@@ -28,7 +28,7 @@ public class ControlPanel extends JPanel {
     private Animator animator;
     private GraphPanel graphPanel;
 
-    private LayoutInterface layoutAlgorithm = new TreeLayout();
+    private LayoutInterface layoutAlgorithm = new RadialPlainLayout();
     private int horizOrderIndex = 0;
 
     private int nodeSize = 20;
@@ -120,7 +120,6 @@ public class ControlPanel extends JPanel {
             }
         });
         treeLayout = new JRadioButton("tree");
-        treeLayout.setSelected(true);
         treeLayout.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -130,6 +129,7 @@ public class ControlPanel extends JPanel {
             }
         });
         radialPlainLayout = new JRadioButton("radial plain");
+        radialPlainLayout.setSelected(true);
         radialPlainLayout.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -143,9 +143,8 @@ public class ControlPanel extends JPanel {
         radialSmartLayout.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                JOptionPane.showMessageDialog(null, "in the next version :)", "coming up soon...", JOptionPane.PLAIN_MESSAGE);
-//				if(radialSmartLayout.isEnabled())
-//					setLayoutAlgorithm(3, new RadialSmartLayout());
+				if(radialSmartLayout.isEnabled())
+					setLayoutAlgorithm(3, new RadialSmartLayout());
             }
         });
         randomLayout = new JRadioButton("random");
@@ -270,8 +269,7 @@ public class ControlPanel extends JPanel {
                             + "\n\ncrash-causes:"
                             + "\n- at this point this program can only handle strict tree-structures (every node but the rootnode has exactly one parent)"
                             + "\n   importing other kind of graphs might result in funny things"
-                            + "\n- ... you tell me? probably quite some :)"
-                            + "\n\n\nbenjaminaaron / Version 3 / October 2013", "help", JOptionPane.PLAIN_MESSAGE);
+                            + "\n- ...", "help", JOptionPane.PLAIN_MESSAGE);
                 }
             }
         });
