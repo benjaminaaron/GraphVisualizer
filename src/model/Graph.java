@@ -1,5 +1,7 @@
 package model;
 
+import model.Animation.Timeline;
+
 import java.util.ArrayList;
 
 
@@ -14,7 +16,6 @@ public class Graph {
     private ArrayList<Node> forCollectingAttached = new ArrayList<>();
 
     private Timeline timeline;
-
 
     public Graph() {}
 
@@ -56,7 +57,6 @@ public class Graph {
 
         return nodeAdded.getID();
     }
-
 
     public void addChildToThisParentNextToThisSibling(String clickedNodeID, String closestNodeToReleaseID, boolean rightFromThis) {
         Node clickedNode = findNodeByID(clickedNodeID);
@@ -103,7 +103,6 @@ public class Graph {
             node.resetNode();
         }
     }
-
 
     public void expand(int horizOrderIndex) {
         resetNodes();
@@ -262,7 +261,6 @@ public class Graph {
         return collect;
     }
 
-
     public int getMaxVertical() {
         return maxVertical;
     }
@@ -282,145 +280,29 @@ public class Graph {
         return forCollectingAttached;
     }
 
+/*  // propably necessary later for Bottom-up ParentsStartAtChildrenPos animations...
+    public ArrayList<Node> getAncestryOfThisNode(Node youngest){
+        ArrayList<Node> temp = new ArrayList<>();
+        temp.add(youngest);
+        if(!youngest.getIsRoot()){
+            Node nextHigher = youngest.getParent();
+            while(nextHigher != null){
+                System.out.println(nextHigher.getID());
+                temp.add(nextHigher);
+                nextHigher = nextHigher.getParent();
+            }
+        }
+        return temp;
+    }
+*/
+
+    public Point getGraphCenterPoint(){
+        double xSum = 0;
+        double ySum = 0;
+        for(Node node : nodes){
+            xSum += node.getX();
+            ySum += node.getY();
+        }
+        return new Point("", xSum / nodes.size(), ySum / nodes.size());
+    }
 }
-
-
-
-// old keyframe-handling, is now happening in AnimationProduction
-
-//private Frame[] keyframesTwo = new Frame[2];
-//private ArrayList<Frame> keyframesLevelwise = new ArrayList<>();
-//private ArrayList<Frame> keyframesNodewise = new ArrayList<>();
-
-/*public void setFirstKeyframe() {
-    addKeyframeLevelwiseAndNodewise();
-}
-
-    public void setFirstKeyframeTwo() {
-        keyframesTwo[0] = takeKeyframeNow();
-    }
-
-    public void nodeSetPos(Node node, double x, double y) {
-        node.setPos(x, y);
-        if (node != rootnode) //otherwise that feels like "lagging" when there is an anim-step for the rootnode-placement on 0,0 because it IS already on 0,0
-        {
-            keyframesNodewise.add(takeKeyframeNow());
-        }
-    }
-
-    public void addHelplinesKeyframe(ArrayList<Line> helplines) {
-        Frame helplineKeyframe = takeKeyframeNow();
-        for (Line helpline : helplines) {
-            helplineKeyframe.addHelpline(helpline);
-        }
-        keyframesNodewise.add(helplineKeyframe);
-    }
-
-    public void addKeyframeLevelwise() {
-        keyframesLevelwise.add(takeKeyframeNow());
-    }
-
-    public void addKeyframeLevelwiseAndNodewise() {
-        Frame now = takeKeyframeNow();
-        keyframesLevelwise.add(now);
-        keyframesNodewise.add(now);
-    }
-
-    private Frame takeKeyframeNow() {
-        Frame keyframe = new Frame();
-        for (Node node : nodes) {
-            keyframe.addPoint(node.getPoint());
-        }
-        for (Edge edge : edges) {
-            keyframe.addLine(edge.getLine());
-        }
-        return keyframe;
-    }
-
-    public Timeline getTimeline() {
-        System.out.println("Graph class delivered snapshotsFine with size: " + keyframesNodewise.size());
-        keyframesTwo[1] = takeKeyframeNow();
-        addKeyframeLevelwise();
-        return new Timeline(takeKeyframeNow(), keyframesTwo, keyframesLevelwise, keyframesNodewise);
-    }
-
-    public void clearTimeline() {
-        keyframesLevelwise.clear();
-        keyframesNodewise.clear();
-    }*/
-
-
-
-
-//public Graph(Graph graph){ //plain copy, needs to be expanded again
-//for(Node node : graph.getNodes())
-//	nodes.add(new Node(node));
-//for(Edge edge : graph.getEdges())
-//	edges.add(new Edge(findNodeByID(edge.getSource().getID()), findNodeByID(edge.getTarget().getID())));
-//}
-//
-
-
-//old expand
-////vertical order
-//for(Node leaf : leaves){
-//	int count = 0;
-//	Node parent = leaf.getParent();
-//	while (parent != null){ //count up until rootnode reached (= parent is null)
-//		count ++;
-//		parent = parent.getParent();
-//	}
-//	if(count > maxVertical) maxVertical = count;		
-//	
-//	leaf.setVertical(count); // the leaf we started counting from is on vertical level <count>
-//	parent = leaf.getParent();
-//	
-//	while (parent != null){ // count down from leaf upwards, rootnode will get zero //  && parent.getVertical() == -1, excluded from condition because then export() is not resetting correctly
-//		count --;
-//		parent.setVertical(count);
-//		parent = parent.getParent();
-//	}
-//}
-//	
-////total Children
-//for(int i = maxVertical; i >= 0; i--){
-//	for(Node node : getNodesAtLevel(i))
-//		if(!node.getIsLeaf()){
-//			for(Node child : node.getChildren())
-//				node.addToTotalChildren(child.getTotalChildren());					
-//			node.addToTotalChildren(node.getChildren().size());
-//		}
-//}
-//
-////horizontal order
-//
-//if(horizOrderIndex == 0) // no order, just as they come in
-//	for(int i = maxVertical; i >= 0; i--){
-//		int count = 1;
-//		for(Node node : getNodesAtLevel(i)){
-//			node.setHorizontal(count);
-//			count ++;			
-//		}
-//	}
-//if(horizOrderIndex == 1 && nodes.size() > 1){ //if only rootnode this would crash
-//	int[] horizLevelwiseCounter = new int[maxVertical];			
-//
-//	//mark leftest branch
-//	Node current = rootnode;		
-//	int vertCount = 0;
-//	
-//	ArrayList<Node> toCheckNext = new ArrayList<>();
-//	
-//	while(!current.getIsLeaf()){
-//		
-//		for(int i = 1; i < current.getChildren().size(); i++)
-//			toCheckNext.add(current.getChildren().get(i));
-//		
-//		current = current.getChildren().get(0);
-//		
-//		current.setHorizontal(1);
-//		horizLevelwiseCounter[vertCount] += 1;	
-//		vertCount ++;
-//	}	
-//}
-//

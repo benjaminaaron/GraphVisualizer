@@ -1,7 +1,6 @@
-package model;
+package model.Layout;
 
 import model.Graph;
-import model.LayoutInterface;
 
 public class RadialSmartLayout implements LayoutInterface {
 

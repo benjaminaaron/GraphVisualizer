@@ -1,6 +1,5 @@
 package view;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -12,10 +11,10 @@ import javax.swing.JPanel;
 
 import controller.MouseControl;
 import controller.MouseMotionControl;
-import model.Frame;
+import model.Animation.Frame;
 import model.Line;
 import model.Point;
-import model.Timeline;
+import model.Animation.Timeline;
 
 
 public class GraphPanel extends JPanel {
@@ -36,7 +35,6 @@ public class GraphPanel extends JPanel {
     /**
      * The index of the current animation type.
      */
-    private int animIndex;
     private Timeline timeline;
     private Frame currentFrame;
     private int animStepsBtwnKeyframes = 15;
@@ -75,7 +73,6 @@ public class GraphPanel extends JPanel {
         nodeVertDist = controlPanel.getNodVertDist();
 
         this.animationPanel = animationPanel;
-        animIndex = animationPanel.getAnimIndex();
     }
 
     public void setNodeSizeAndNodeVertDist(int nodeSize, int nodeVertDist) {
@@ -162,12 +159,8 @@ public class GraphPanel extends JPanel {
         this.currentFrame = currentFrame;
     }
 
-    public void setAnimIndex(int index) {
-        animIndex = index;
-    }
-
     private void showTimeline() {
-        if (animIndex == 0) {
+        if (timeline.getKeyframes().size() == 1) {
             currentFrame = timeline.getKeyframes().get(0);
             repaint();
         }

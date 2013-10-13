@@ -1,28 +1,27 @@
 package view;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
+import javax.swing.*;
 
 import model.*;
+import model.Animation.Frame;
+import model.Animation.Timeline;
+import model.Layout.*;
 
 
 public class ControlPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private JLabel layoutLabel, animLabel, orderLabel; //graphLabel
-    private JButton newButton, sampleButton, sample2Button, importButton, exportButton, helpButton, consoleShowButton;
-    private JRadioButton basicLayout, treeLayout, radialPlainLayout, radialSmartLayout, randomLayout, chronoOrder, leftOrder, rightOrder, middleFullOrder, middleEmptyOrder;
+    private JLabel layoutLabel, orderLabel;
+    private JButton newButton, importButton, exportButton, helpButton, consoleShowButton;
+    private JComboBox sampleComboBox, layoutComboBox, orderComboBox;
 
     private Model model;
     private Animator animator;
@@ -65,8 +64,8 @@ public class ControlPanel extends JPanel {
 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
-//		graphLabel = new JLabel("  Graph: ");
-//		add(graphLabel);
+		JLabel graphLabel = new JLabel("  Graph: ");
+		add(graphLabel);
 
         newButton = new JButton("new");
         newButton.addMouseListener(new MouseAdapter() {
@@ -79,31 +78,33 @@ public class ControlPanel extends JPanel {
         });
         add(newButton);
 
-        sampleButton = new JButton("sample 1");
-        sampleButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (sampleButton.isEnabled()) {
-                    treeLayout.setSelected(true);
-                    setLayoutAlgorithm(1, new TreeLayout());
-                    initSampleGraph(1);
-                }
-            }
-        });
-        add(sampleButton);
+        JLabel sampleLabel = new JLabel("   load sample: ");
+        add(sampleLabel);
 
-        sample2Button = new JButton("sample 2");
-        sample2Button.addMouseListener(new MouseAdapter() {
+        String[] animOptions = {"sample 1", "sample 2"};
+        sampleComboBox = new JComboBox(animOptions);
+        sampleComboBox.setSelectedItem("sample 1");
+        sampleComboBox.addActionListener(new ActionListener(){
             @Override
-            public void mouseReleased(MouseEvent e) {
-                if (sample2Button.isEnabled()) {
-                    radialPlainLayout.setSelected(true);
-                    setLayoutAlgorithm(2, new RadialPlainLayout());
-                    initSampleGraph(2);
+            public void actionPerformed(ActionEvent e) {
+                switch ((String) sampleComboBox.getSelectedItem()) {
+                    case "sample 1":
+                        layoutComboBox.setSelectedItem("tree");
+                        setLayoutAlgorithm(1, new TreeLayout());
+                        initSampleGraph(1);
+                        break;
+                    case "sample 2":
+                        layoutComboBox.setSelectedItem("radial plain");
+                        setLayoutAlgorithm(2, new RadialPlainLayout());
+                        initSampleGraph(2);
+                        break;
                 }
             }
         });
-        add(sample2Button);
+        add(sampleComboBox);
+
+        JLabel blankLabel = new JLabel("     ");
+        add(blankLabel);
 
         importButton = new JButton("import");
         importButton.addMouseListener(new MouseAdapter() {
@@ -124,125 +125,75 @@ public class ControlPanel extends JPanel {
         layoutLabel = new JLabel("    Layout: ");
         add(layoutLabel);
 
-        ButtonGroup layoutGroup = new ButtonGroup();
-        basicLayout = new JRadioButton("plain");
-        basicLayout.addMouseListener(new MouseAdapter() {
+
+        String[] layoutOptions = {"plain", "tree", "radial plain", "random"};
+        layoutComboBox = new JComboBox(layoutOptions);
+        layoutComboBox.setSelectedItem("tree");
+        layoutComboBox.addActionListener(new ActionListener(){
             @Override
-            public void mouseReleased(MouseEvent e) {
-                if (basicLayout.isEnabled()) {
-                    setLayoutAlgorithm(0, new BasicLayout());
+            public void actionPerformed(ActionEvent e) {
+                switch ((String) layoutComboBox.getSelectedItem()) {
+                    case "plain":
+                        setLayoutAlgorithm(0, new BasicLayout());
+                        break;
+                    case "tree":
+                        setLayoutAlgorithm(1, new TreeLayout());
+                        break;
+                    case "radial plain":
+                        setLayoutAlgorithm(2, new RadialPlainLayout());
+                        break;
+                    case "random":
+                        setLayoutAlgorithm(4, new RandomLayout());
+                        break;
                 }
             }
         });
-        treeLayout = new JRadioButton("tree");
-        treeLayout.setSelected(true);
-        treeLayout.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (treeLayout.isEnabled()) {
-                    setLayoutAlgorithm(1, new TreeLayout());
-                }
-            }
-        });
-        radialPlainLayout = new JRadioButton("radial plain");
-        radialPlainLayout.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (radialPlainLayout.isEnabled()) {
-                    setLayoutAlgorithm(2, new RadialPlainLayout());
-                }
-            }
-        });
-        radialSmartLayout = new JRadioButton("radial smart");
-        radialSmartLayout.setEnabled(false);
-        radialSmartLayout.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-				if(radialSmartLayout.isEnabled())
-					setLayoutAlgorithm(3, new RadialSmartLayout());
-            }
-        });
-        randomLayout = new JRadioButton("random");
-        randomLayout.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (randomLayout.isEnabled()) {
-                    setLayoutAlgorithm(4, new RandomLayout());
-                }
-            }
-        });
-        layoutGroup.add(basicLayout);
-        layoutGroup.add(treeLayout);
-        //layoutGroup.add(radialPlainLayout);
-        layoutGroup.add(radialSmartLayout);
-        layoutGroup.add(randomLayout);
-        add(basicLayout);
-        add(treeLayout);
-        add(radialPlainLayout);
-        //add(radialSmartLayout);
-        add(randomLayout);
+        add(layoutComboBox);
 
 
-        orderLabel = new JLabel("   |  Order: ");
+        orderLabel = new JLabel("       Order: ");
         add(orderLabel);
 
-        ButtonGroup orderGroup = new ButtonGroup();
-        chronoOrder = new JRadioButton("chronological");
-        chronoOrder.setSelected(true);
-        chronoOrder.addMouseListener(new MouseAdapter() {
+        String[] orderOptions = {"chronological", "left", "right", "middle full", "middle empty"};
+        orderComboBox = new JComboBox(orderOptions);
+        orderComboBox.setSelectedItem("chronological");
+        orderComboBox.addActionListener(new ActionListener(){
             @Override
-            public void mouseReleased(MouseEvent e) {
-                if (chronoOrder.isEnabled()) {
-                    setHorizOrderIndex(0);
+            public void actionPerformed(ActionEvent e) {
+                switch ((String) orderComboBox.getSelectedItem()) {
+                    case "chronological":
+                        setHorizOrderIndex(0);
+                        break;
+                    case "left":
+                        setHorizOrderIndex(1);
+                        break;
+                    case "right":
+                        setHorizOrderIndex(2);
+                        break;
+                    case "middle full":
+                        setHorizOrderIndex(3);
+                        break;
+                    case "middle empty":
+                        setHorizOrderIndex(4);
+                        break;
                 }
             }
         });
-        leftOrder = new JRadioButton("left");
-        leftOrder.addMouseListener(new MouseAdapter() {
+        add(orderComboBox);
+
+        JLabel blankLabel2 = new JLabel("       ");
+        add(blankLabel2);
+
+        consoleShowButton = new JButton("show data");
+        consoleShowButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (leftOrder.isEnabled()) {
-                    setHorizOrderIndex(1);
+                if (consoleShowButton.isEnabled()) {
+                    consoleShow();
                 }
             }
         });
-        rightOrder = new JRadioButton("right");
-        rightOrder.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (rightOrder.isEnabled()) {
-                    setHorizOrderIndex(2);
-                }
-            }
-        });
-        middleFullOrder = new JRadioButton("middle full");
-        middleFullOrder.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (middleFullOrder.isEnabled()) {
-                    setHorizOrderIndex(3);
-                }
-            }
-        });
-        middleEmptyOrder = new JRadioButton("middle empty");
-        middleEmptyOrder.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (middleEmptyOrder.isEnabled()) {
-                    setHorizOrderIndex(4);
-                }
-            }
-        });
-        orderGroup.add(chronoOrder);
-        orderGroup.add(leftOrder);
-        orderGroup.add(rightOrder);
-        orderGroup.add(middleFullOrder);
-        orderGroup.add(middleEmptyOrder);
-        add(chronoOrder);
-        add(leftOrder);
-        add(rightOrder);
-        add(middleFullOrder);
-        add(middleEmptyOrder);
+        add(consoleShowButton);
 
         exportButton = new JButton("export");
         exportButton.addMouseListener(new MouseAdapter() {
@@ -259,32 +210,19 @@ public class ControlPanel extends JPanel {
         });
         add(exportButton);
 
-        consoleShowButton = new JButton("show data");
-        consoleShowButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (consoleShowButton.isEnabled()) {
-                    consoleShow();
-                }
-            }
-        });
-        add(consoleShowButton);
-
         helpButton = new JButton("help");
         helpButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (helpButton.isEnabled()) {
                     JOptionPane.showMessageDialog(null, "left mouse-click:     add a child to the clicked node"
-                            + "\nleft mouse-click and release between nodes below:   add a child at that position between it's siblings"
+                            //+ "\nleft mouse-click and release between nodes below:   add a child at that position between it's siblings"   //feature currently inactive
                             + "\nright mouse-click:  delete a node & everything attached to it"
                             + "\n\nimport & export in graphml-format / e.g. yEd (freeware) uses that"
-                            + "\nin the animation mode 'nodewise' there is a first attempt to show helplines, if activated"
-                            + "\nradial plain looks cool when just one rootnode-child gets looots of children - and then add another rootnode-child"
-                            + "\n\ncrash-causes:"
-                            + "\n- at this point this program can only handle strict tree-structures (every node but the rootnode has exactly one parent)"
-                            + "\n   importing other kind of graphs might result in funny things"
-                            + "\n- ...", "help", JOptionPane.PLAIN_MESSAGE);
+                            //+ "\nin the animation mode 'nodewise' there is a first attempt to show helplines, if activated"  //feature also currently inactive
+                            + "\n\nat this point this program can only handle strict tree-structures (every node but the"
+                            + "\nrootnode has exactly one parent) importing other kind of graphs might result in funny things"
+                            , "help", JOptionPane.PLAIN_MESSAGE);
                 }
             }
         });
@@ -319,8 +257,9 @@ public class ControlPanel extends JPanel {
     }
 
     public void handleNodeClicked(String clickedNodeID, String closestNodeToRelease, boolean rightFromThis) {
-        model.handleNodeClicked(clickedNodeID, closestNodeToRelease, rightFromThis);
-        graphPanel.setTimeline(model.getTimeline());
+//TODO needs reworking as mentioned in the model method
+//        model.handleNodeClicked(clickedNodeID, closestNodeToRelease, rightFromThis);
+//        graphPanel.setTimeline(model.getTimeline());
     }
 
     private void setLayoutAlgorithm(int index, LayoutInterface layoutAlgorithm) {

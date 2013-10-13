@@ -1,21 +1,15 @@
 package view;
 
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSlider;
-
+import model.Animation.*;
 import model.Model;
 
 public class AnimationPanel extends JPanel {
@@ -27,18 +21,18 @@ public class AnimationPanel extends JPanel {
     private GraphPanel graphPanel;
 
     private JButton pauseButton, stopButton;
-    private JLabel animLabel, animSpeedLabel, blankLabel, nodeSizeLabel, nodeVertDistLabel, nodeMinHorizDistLabel, horizontalAnimLabel, verticalAnimLabel, nodewiseAnimLabel;
-    private JRadioButton noAnim, shortAnim, horizontalTopDownAnim, horizontalBottomUpAnim, nodewiseAnim, verticalL2Ranim, verticalR2Lanim, randomNodewiseAnim;
+    private JLabel animLabel, animSpeedLabel, nodeSizeLabel, nodeVertDistLabel, nodeMinHorizDistLabel;
     private JSlider animSpeedSlider, nodeSizeSlider, nodeVertDistSlider, nodeMinHorizDistSlider;
     private JCheckBox showNodeIDCheckbox;//, showHelplinesCheckbox;
+    private JComboBox animComboBox;
 
     private int nodeSize = 20;
     private int nodeVertDist = 40;
     private int nodeMinHorizDist = 30;
 
+    private AnimationInterface animationAlgorithm = new ProduceShortTimeline();
 
     //index of the current animation-type
-    private int animIndex = 1;
 
     public void setModel(Model model) {
         this.model = model;
@@ -48,120 +42,60 @@ public class AnimationPanel extends JPanel {
         this.animator = animator;
     }
 
-    public int getAnimIndex() {
-        return animIndex;
-    }
-
     public AnimationPanel(GraphPanel graphPanel) {
         this.graphPanel = graphPanel;
-
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 
         animLabel = new JLabel("  Animation: ");
         add(animLabel);
 
-        ButtonGroup animGroup = new ButtonGroup();
-        noAnim = new JRadioButton("none");
-        noAnim.addMouseListener(new MouseAdapter() {
+        String[] animOptions = {"none", "short", "top-down", "top-down + childrenStartAtParentPos", "bottom-up", "left to right", "right to left", "recursive", "recursive + siblingsCompleteFirst", "random", "rotating circle"};
+        animComboBox = new JComboBox(animOptions);
+        animComboBox.setSelectedItem("short");
+        animComboBox.addActionListener(new ActionListener(){
             @Override
-            public void mouseReleased(MouseEvent e) {
-                if (noAnim.isEnabled()) {
-                    setAnimIndex(0);
+            public void actionPerformed(ActionEvent e) {
+                switch ((String) animComboBox.getSelectedItem()) {
+                    case "none":
+                        animator.finish();
+                        setAnimationAlgorithm(new ProduceSingleFinalframeTimeline());
+                        break;
+                    case "short":
+                        setAnimationAlgorithm(new ProduceShortTimeline());
+                        break;
+                    case "top-down":
+                        setAnimationAlgorithm(new ProduceHorizontalTopDownTimeline());
+                        break;
+                    case "top-down + childrenStartAtParentPos":
+                        setAnimationAlgorithm(new ProduceHorizTDChildrenStartAtParentPosTimeline());
+                        break;
+                    case "bottom-up":
+                        setAnimationAlgorithm(new ProduceHorizontalBottomUpTimeline());
+                        break;
+                    case "left to right":
+                        setAnimationAlgorithm(new ProduceVerticalL2Rtimeline());
+                        break;
+                    case "right to left":
+                        setAnimationAlgorithm(new ProduceVerticalR2Ltimeline());
+                        break;
+                    case "recursive":
+                        setAnimationAlgorithm(new ProduceNodewiseRecursivelyTimeline());
+                        break;
+                    case "recursive + siblingsCompleteFirst":
+                        setAnimationAlgorithm(new ProduceNodewRecSiblingsCompleteFirstTimeline());
+                        break;
+                    case "random":
+                        setAnimationAlgorithm(new ProduceNodewiseRandomTimeline());
+                        break;
+                    case "rotating circle":
+                        setAnimationAlgorithm(new ProduceRotateCircleTestTimeline());
                 }
             }
         });
-        shortAnim = new JRadioButton("short");
-        shortAnim.setSelected(true);
-        shortAnim.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (shortAnim.isEnabled()) {
-                    setAnimIndex(1);
-                }
-            }
-        });
+        add(animComboBox);
 
-//        horizontalAnimLabel = new JLabel("  horizontal: ");
-//        add(horizontalAnimLabel);
-
-        horizontalTopDownAnim = new JRadioButton("top-down");
-        horizontalTopDownAnim.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (horizontalTopDownAnim.isEnabled()) {
-                    setAnimIndex(2);
-                }
-            }
-        });
-        horizontalBottomUpAnim = new JRadioButton("bottom-up");
-        horizontalBottomUpAnim.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (horizontalBottomUpAnim.isEnabled()) {
-                    setAnimIndex(3);
-                }
-            }
-        });
-
-//        verticalAnimLabel = new JLabel("  vertical: ");
-//        add(verticalAnimLabel);
-
-        verticalL2Ranim = new JRadioButton("left > right");
-        verticalL2Ranim.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (verticalL2Ranim.isEnabled()) {
-                    setAnimIndex(4);
-                }
-            }
-        });
-        verticalR2Lanim = new JRadioButton("left < right");
-        verticalR2Lanim.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (verticalR2Lanim.isEnabled()) {
-                    setAnimIndex(5);
-                }
-            }
-        });
-
-//        nodewiseAnimLabel = new JLabel("  nodewise: ");
-//        add(nodewiseAnimLabel);
-
-        nodewiseAnim = new JRadioButton("recursively");
-        nodewiseAnim.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (nodewiseAnim.isEnabled()) {
-                    setAnimIndex(6);
-                }
-            }
-        });
-        randomNodewiseAnim = new JRadioButton("random");
-        randomNodewiseAnim.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (randomNodewiseAnim.isEnabled()) {
-                    setAnimIndex(7);
-                }
-            }
-        });
-        animGroup.add(noAnim);
-        animGroup.add(shortAnim);
-        animGroup.add(horizontalTopDownAnim);
-        animGroup.add(horizontalBottomUpAnim);
-        animGroup.add(verticalL2Ranim);
-        animGroup.add(verticalR2Lanim);
-        animGroup.add(nodewiseAnim);
-        animGroup.add(randomNodewiseAnim);
-        add(noAnim);
-        add(shortAnim);
-        add(horizontalTopDownAnim);
-        add(horizontalBottomUpAnim);
-        add(verticalL2Ranim);
-        add(verticalR2Lanim);
-        add(nodewiseAnim);
-        add(randomNodewiseAnim);
+        JLabel blankLabel = new JLabel("         ");
+        add(blankLabel);
 
         pauseButton = new JButton("pause");
         pauseButton.setEnabled(false);
@@ -310,10 +244,8 @@ public class AnimationPanel extends JPanel {
         }
     }
 
-    private void setAnimIndex(int index) {
-        animIndex = index;
-        graphPanel.setAnimIndex(index);
-        model.setAnimIndex(index);
+    private void setAnimationAlgorithm(AnimationInterface animationAlgorithm){
+        model.setAnimationAlgorithm(animationAlgorithm);
         graphPanel.setTimeline(model.getTimeline());
     }
 
@@ -321,6 +253,4 @@ public class AnimationPanel extends JPanel {
         pauseButton.setEnabled(!onoff);
         stopButton.setEnabled(!onoff);
     }
-
-
 }

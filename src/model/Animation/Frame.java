@@ -1,9 +1,13 @@
-package model;
+package model.Animation;
+
+import model.Line;
+import model.Point;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class Frame {
+
+    public double timeFactor = 1;
 
     public ArrayList<Point> points = new ArrayList<>();
     public ArrayList<Line> lines = new ArrayList<>();

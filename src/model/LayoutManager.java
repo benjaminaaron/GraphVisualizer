@@ -1,8 +1,10 @@
 package model;
 
+import model.Layout.LayoutInterface;
+
 public class LayoutManager {
 
-    private LayoutInterface layoutAlgorithm; // by Sanjo, much nicer because the layouting-object is already passed on from the ControlPanel and it saves many "if index == xy" lines in the performLayout method 
+    private LayoutInterface layoutAlgorithm; // by Sanjo, much nicer because the layouting-object is already passed on from the ControlPanel and it saves many "if index == xy" lines in the performLayout method
     private int nodeSize;
     private int nodeVertDist;
     private int nodeMinHorizDist;

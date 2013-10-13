@@ -1,4 +1,6 @@
-package model;
+package model.Layout;
+
+import model.Graph;
 
 public interface LayoutInterface {
 

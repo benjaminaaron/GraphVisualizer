@@ -1,4 +1,7 @@
-package model;
+package model.Layout;
+
+import model.Graph;
+import model.Node;
 
 import java.util.ArrayList;
 

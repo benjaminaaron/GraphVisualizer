@@ -1,6 +1,6 @@
 package view;
 
-import model.Frame;
+import model.Animation.Frame;
 
 import java.util.ArrayList;
 
