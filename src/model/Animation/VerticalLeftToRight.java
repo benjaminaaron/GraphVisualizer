@@ -5,7 +5,7 @@ import model.Node;
 
 import java.util.ArrayList;
 
-public class ProduceVerticalL2Rtimeline extends AnimationMainClass{
+public class VerticalLeftToRight extends AnimationProducerBase {
 
     @Override
     public Timeline produceTimeline() {

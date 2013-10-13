@@ -1,7 +1,7 @@
 package model.Animation;
 
 
-public class ProduceSingleFinalframeTimeline extends AnimationMainClass {
+public class SingleFinalFrame extends AnimationProducerBase {
 
     @Override
     public Timeline produceTimeline() {

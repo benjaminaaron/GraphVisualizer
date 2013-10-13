@@ -3,17 +3,20 @@ package model.Animation;
 
 import model.Node;
 
-public class ProduceHorizontalBottomUpTimeline extends AnimationMainClass {
+import java.util.ArrayList;
+
+public class HorizontalTopDown extends AnimationProducerBase {
 
     @Override
     public Timeline produceTimeline() {
         reset();
         createZeroState();
         timeline.addKeyframe(new Frame(points, lines));
-        for(int i = graph.getMaxVertical(); i >= 0 ; i--){
-            for(Node node : graph.getNodesAtLevel(i))
+        for (ArrayList<Node> level : graph.getNodesLevels()) {
+            for(Node node : level)
                 findPointByNodeID(node.getID()).setPos(node.getX(), node.getY());
-            timeline.addKeyframe(new Frame(points, lines));
+            if(!level.get(0).getIsRoot())
+                timeline.addKeyframe(new Frame(points, lines));
         }
         return timeline;
     }

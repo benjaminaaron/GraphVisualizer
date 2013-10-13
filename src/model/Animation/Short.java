@@ -4,7 +4,7 @@ package model.Animation;
 import model.Line;
 import model.Point;
 
-public class ProduceShortTimeline extends AnimationMainClass {
+public class Short extends AnimationProducerBase {
 
     private Frame previousFrame = null;
 

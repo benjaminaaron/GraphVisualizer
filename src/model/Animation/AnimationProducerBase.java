@@ -4,7 +4,7 @@ import model.*;
 import java.util.ArrayList;
 import java.util.Random;
 
-public abstract class AnimationMainClass implements AnimationInterface {
+public abstract class AnimationProducerBase implements AnimationProducer {
 
     protected Graph graph;
     protected ArrayList<Point> points = new ArrayList<>();
@@ -12,7 +12,7 @@ public abstract class AnimationMainClass implements AnimationInterface {
     protected ArrayList<Line> lines = new ArrayList<>();
     protected Timeline timeline = new Timeline();
 
-    public AnimationMainClass(){};
+    public AnimationProducerBase(){};
 
     @Override
     public void setGraph(Graph graph) {

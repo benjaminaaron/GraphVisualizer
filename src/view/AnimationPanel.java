@@ -10,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import model.Animation.*;
+import model.Animation.Short;
 import model.Model;
 
 public class AnimationPanel extends JPanel {
@@ -30,7 +31,7 @@ public class AnimationPanel extends JPanel {
     private int nodeVertDist = 40;
     private int nodeMinHorizDist = 30;
 
-    private AnimationInterface animationAlgorithm = new ProduceShortTimeline();
+    private AnimationProducer animationAlgorithm = new Short();
 
     //index of the current animation-type
 
@@ -58,37 +59,37 @@ public class AnimationPanel extends JPanel {
                 switch ((String) animComboBox.getSelectedItem()) {
                     case "none":
                         animator.finish();
-                        setAnimationAlgorithm(new ProduceSingleFinalframeTimeline());
+                        setAnimationAlgorithm(new SingleFinalFrame());
                         break;
                     case "short":
-                        setAnimationAlgorithm(new ProduceShortTimeline());
+                        setAnimationAlgorithm(new Short());
                         break;
                     case "top-down":
-                        setAnimationAlgorithm(new ProduceHorizontalTopDownTimeline());
+                        setAnimationAlgorithm(new HorizontalTopDown());
                         break;
                     case "top-down + childrenStartAtParentPos":
-                        setAnimationAlgorithm(new ProduceHorizTDChildrenStartAtParentPosTimeline());
+                        setAnimationAlgorithm(new HorizontalTDChildrenStartAtParentPosition());
                         break;
                     case "bottom-up":
-                        setAnimationAlgorithm(new ProduceHorizontalBottomUpTimeline());
+                        setAnimationAlgorithm(new HorizontalBottomUp());
                         break;
                     case "left to right":
-                        setAnimationAlgorithm(new ProduceVerticalL2Rtimeline());
+                        setAnimationAlgorithm(new VerticalLeftToRight());
                         break;
                     case "right to left":
-                        setAnimationAlgorithm(new ProduceVerticalR2Ltimeline());
+                        setAnimationAlgorithm(new VerticalRightToLeft());
                         break;
                     case "recursive":
-                        setAnimationAlgorithm(new ProduceNodewiseRecursivelyTimeline());
+                        setAnimationAlgorithm(new NodewiseRecursively());
                         break;
                     case "recursive + siblingsCompleteFirst":
-                        setAnimationAlgorithm(new ProduceNodewRecSiblingsCompleteFirstTimeline());
+                        setAnimationAlgorithm(new NodewiseRecSiblingsCompleteFirst());
                         break;
                     case "random":
-                        setAnimationAlgorithm(new ProduceNodewiseRandomTimeline());
+                        setAnimationAlgorithm(new NodewiseRandom());
                         break;
                     case "rotating circle":
-                        setAnimationAlgorithm(new ProduceRotateCircleTestTimeline());
+                        setAnimationAlgorithm(new RotateCircleTest());
                 }
             }
         });
@@ -244,7 +245,7 @@ public class AnimationPanel extends JPanel {
         }
     }
 
-    private void setAnimationAlgorithm(AnimationInterface animationAlgorithm){
+    private void setAnimationAlgorithm(AnimationProducer animationAlgorithm){
         model.setAnimationAlgorithm(animationAlgorithm);
         graphPanel.setTimeline(model.getTimeline());
     }

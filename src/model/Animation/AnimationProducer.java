@@ -3,7 +3,7 @@ package model.Animation;
 
 import model.Graph;
 
-public interface AnimationInterface {
+public interface AnimationProducer {
 
     public void setGraph(Graph graph);
 

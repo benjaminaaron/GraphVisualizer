@@ -4,7 +4,7 @@ package model.Animation;
 import model.Node;
 import model.Point;
 
-public class ProduceNodewiseRandomTimeline extends AnimationMainClass{
+public class NodewiseRandom extends AnimationProducerBase {
 
     @Override
     public Timeline produceTimeline() {

@@ -1,6 +1,7 @@
 package model;
 
 import model.Animation.*;
+import model.Animation.Short;
 import model.Layout.*;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
@@ -13,7 +14,7 @@ public class Model {
     private int horizOrderIndex = 0;
     private int animIndex = 1;
     private LayoutManager layoutManager;
-    private AnimationInterface animationAlgorithm = new ProduceShortTimeline();
+    private AnimationProducer animationAlgorithm = new Short();
 
     private boolean inShortAnim = true;
 
@@ -48,8 +49,8 @@ public class Model {
         System.out.println("order index changed to: " + index);
     }
 
-    public void setAnimationAlgorithm(AnimationInterface animationAlgorithm){
-        inShortAnim = animationAlgorithm.getClass().toString().equals("class model.Animation.ProduceShortTimeline");
+    public void setAnimationAlgorithm(AnimationProducer animationAlgorithm){
+        inShortAnim = animationAlgorithm.getClass().toString().equals("class model.Animation.Short");
         this.animationAlgorithm = animationAlgorithm;
         this.animationAlgorithm.setGraph(graph);
         graph.setTimeline(this.animationAlgorithm.produceTimeline());
@@ -88,7 +89,7 @@ public class Model {
 
         if(inShortAnim){
             //save state for short-Anim
-            ProduceSingleFinalframeTimeline temp1 = new ProduceSingleFinalframeTimeline();
+            SingleFinalFrame temp1 = new SingleFinalFrame();
             temp1.setGraph(graph);
             stateBeforeClick = temp1.produceTimeline().getKeyframes().get(0);
         }
@@ -116,7 +117,7 @@ public class Model {
         graph = layoutManager.performLayout(graph);
 
         if(inShortAnim){
-            ProduceShortTimeline temp2 = new ProduceShortTimeline();
+            Short temp2 = new Short();
             temp2.setGraph(graph);
             temp2.setPreviousFrame(stateBeforeClick);
             graph.setTimeline(temp2.produceTimeline());

@@ -3,7 +3,7 @@ package model.Animation;
 
 import model.Point;
 
-public class ProduceRotateCircleTestTimeline extends AnimationMainClass {
+public class RotateCircleTest extends AnimationProducerBase {
     @Override
     public Timeline produceTimeline() {
         reset();

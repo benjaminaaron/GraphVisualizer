@@ -5,7 +5,7 @@ import model.Node;
 
 import java.util.ArrayList;
 
-public class ProduceNodewiseRecursivelyTimeline extends AnimationMainClass {
+public class NodewiseRecursively extends AnimationProducerBase {
 
     @Override
     public Timeline produceTimeline() {

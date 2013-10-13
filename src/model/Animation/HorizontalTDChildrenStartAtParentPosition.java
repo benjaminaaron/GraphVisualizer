@@ -5,7 +5,7 @@ import model.Node;
 
 import java.util.ArrayList;
 
-public class ProduceHorizTDChildrenStartAtParentPosTimeline extends AnimationMainClass {
+public class HorizontalTDChildrenStartAtParentPosition extends AnimationProducerBase {
 
     @Override
     public Timeline produceTimeline() {

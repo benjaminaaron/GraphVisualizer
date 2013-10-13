@@ -5,7 +5,7 @@ import model.Node;
 
 import java.util.ArrayList;
 
-public class ProduceNodewRecSiblingsCompleteFirstTimeline extends AnimationMainClass {
+public class NodewiseRecSiblingsCompleteFirst extends AnimationProducerBase {
 
     @Override
     public Timeline produceTimeline() {
