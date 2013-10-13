@@ -17,6 +17,6 @@ public class Driver {
         mainWindow.getAnimationPanel().setModel(model);
         mainWindow.getAnimationPanel().setAnimator(animator);
         //start with sample graph instead of gray, simulates click on <sample> button
-        mainWindow.getControlPanel().initSampleGraph();
+        mainWindow.getControlPanel().initSampleGraph(1);
     }
 }

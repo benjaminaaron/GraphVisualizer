@@ -10,7 +10,7 @@ public class Animator extends Thread {
     private ArrayList<Frame> frames = new ArrayList<>();
     private int currentAnimationStep = 0;
     private boolean isPaused = false;
-    private int speed = 33;
+    private int speed = 30;
 
     public Animator() {
 

@@ -25,11 +25,7 @@ public class LayoutManager {
     }
 
     public Graph performLayout(Graph graph) {
-        graph.clearTimeline();
-        graph.setFirstKeyframeTwo();
         graph.resetNodesPos();
-        graph.setFirstKeyframe();
-
         return (layoutAlgorithm == null) ? null : layoutAlgorithm.performLayout(graph, nodeSize, nodeMinHorizDist, nodeVertDist);
     }
 }

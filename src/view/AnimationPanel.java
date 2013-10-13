@@ -27,18 +27,17 @@ public class AnimationPanel extends JPanel {
     private GraphPanel graphPanel;
 
     private JButton pauseButton, stopButton;
-    private JLabel animLabel, animSpeedLabel, blankLabel, nodeSizeLabel, nodeVertDistLabel, nodeMinHorizDistLabel;
-    private JRadioButton noAnim, shortAnim, levelByLevelAnim, nodeByNodeAnim;
+    private JLabel animLabel, animSpeedLabel, blankLabel, nodeSizeLabel, nodeVertDistLabel, nodeMinHorizDistLabel, horizontalAnimLabel, verticalAnimLabel, nodewiseAnimLabel;
+    private JRadioButton noAnim, shortAnim, horizontalTopDownAnim, horizontalBottomUpAnim, nodewiseAnim, verticalL2Ranim, verticalR2Lanim, randomNodewiseAnim;
     private JSlider animSpeedSlider, nodeSizeSlider, nodeVertDistSlider, nodeMinHorizDistSlider;
-    private JCheckBox showNodeIDCheckbox, showHelplinesCheckbox;
+    private JCheckBox showNodeIDCheckbox;//, showHelplinesCheckbox;
 
     private int nodeSize = 20;
-    private int nodeVertDist = 50;
+    private int nodeVertDist = 40;
     private int nodeMinHorizDist = 30;
 
-    /**
-     * The index of the current animation type.
-     */
+
+    //index of the current animation-type
     private int animIndex = 1;
 
     public void setModel(Model model) {
@@ -81,51 +80,88 @@ public class AnimationPanel extends JPanel {
                 }
             }
         });
-        levelByLevelAnim = new JRadioButton("levelwise");
-        levelByLevelAnim.addMouseListener(new MouseAdapter() {
+
+//        horizontalAnimLabel = new JLabel("  horizontal: ");
+//        add(horizontalAnimLabel);
+
+        horizontalTopDownAnim = new JRadioButton("top-down");
+        horizontalTopDownAnim.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (levelByLevelAnim.isEnabled()) {
+                if (horizontalTopDownAnim.isEnabled()) {
                     setAnimIndex(2);
                 }
             }
         });
-
-        nodeByNodeAnim = new JRadioButton("nodewise");
-        nodeByNodeAnim.addMouseListener(new MouseAdapter() {
+        horizontalBottomUpAnim = new JRadioButton("bottom-up");
+        horizontalBottomUpAnim.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (nodeByNodeAnim.isEnabled()) {
+                if (horizontalBottomUpAnim.isEnabled()) {
                     setAnimIndex(3);
+                }
+            }
+        });
+
+//        verticalAnimLabel = new JLabel("  vertical: ");
+//        add(verticalAnimLabel);
+
+        verticalL2Ranim = new JRadioButton("left > right");
+        verticalL2Ranim.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (verticalL2Ranim.isEnabled()) {
+                    setAnimIndex(4);
+                }
+            }
+        });
+        verticalR2Lanim = new JRadioButton("left < right");
+        verticalR2Lanim.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (verticalR2Lanim.isEnabled()) {
+                    setAnimIndex(5);
+                }
+            }
+        });
+
+//        nodewiseAnimLabel = new JLabel("  nodewise: ");
+//        add(nodewiseAnimLabel);
+
+        nodewiseAnim = new JRadioButton("recursively");
+        nodewiseAnim.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (nodewiseAnim.isEnabled()) {
+                    setAnimIndex(6);
+                }
+            }
+        });
+        randomNodewiseAnim = new JRadioButton("random");
+        randomNodewiseAnim.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (randomNodewiseAnim.isEnabled()) {
+                    setAnimIndex(7);
                 }
             }
         });
         animGroup.add(noAnim);
         animGroup.add(shortAnim);
-        animGroup.add(levelByLevelAnim);
-        animGroup.add(nodeByNodeAnim);
+        animGroup.add(horizontalTopDownAnim);
+        animGroup.add(horizontalBottomUpAnim);
+        animGroup.add(verticalL2Ranim);
+        animGroup.add(verticalR2Lanim);
+        animGroup.add(nodewiseAnim);
+        animGroup.add(randomNodewiseAnim);
         add(noAnim);
         add(shortAnim);
-        add(levelByLevelAnim);
-        add(nodeByNodeAnim);
-
-
-        animSpeedLabel = new JLabel(" framepause:");
-        add(animSpeedLabel);
-
-        animSpeedSlider = new JSlider();
-        animSpeedSlider.setValue(30);
-        animSpeedSlider.setMinimum(2);
-        animSpeedSlider.setMaximum(60);
-        animSpeedSlider.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent ce) {
-                if (!animSpeedSlider.getValueIsAdjusting()) {
-                    changeAnimSpeed();
-                }
-            }
-        });
-        add(animSpeedSlider);
+        add(horizontalTopDownAnim);
+        add(horizontalBottomUpAnim);
+        add(verticalL2Ranim);
+        add(verticalR2Lanim);
+        add(nodewiseAnim);
+        add(randomNodewiseAnim);
 
         pauseButton = new JButton("pause");
         pauseButton.setEnabled(false);
@@ -151,10 +187,24 @@ public class AnimationPanel extends JPanel {
         });
         add(stopButton);
 
-        blankLabel = new JLabel("    ");
-        add(blankLabel);
+        animSpeedLabel = new JLabel(" speed:");
+        add(animSpeedLabel);
 
-        nodeSizeLabel = new JLabel("nodeSize: " + nodeSize);
+        animSpeedSlider = new JSlider();
+        animSpeedSlider.setValue(30);
+        animSpeedSlider.setMinimum(0);
+        animSpeedSlider.setMaximum(58);
+        animSpeedSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent ce) {
+                if (!animSpeedSlider.getValueIsAdjusting()) {
+                    changeAnimSpeed();
+                }
+            }
+        });
+        add(animSpeedSlider);
+
+        nodeSizeLabel = new JLabel("  size: " + nodeSize);
         add(nodeSizeLabel);
 
         nodeSizeSlider = new JSlider();
@@ -168,11 +218,11 @@ public class AnimationPanel extends JPanel {
         });
         add(nodeSizeSlider);
 
-        nodeVertDistLabel = new JLabel("nodeVertDist: " + nodeVertDist);
+        nodeVertDistLabel = new JLabel("vert dist: " + nodeVertDist);
         add(nodeVertDistLabel);
 
         nodeVertDistSlider = new JSlider();
-        nodeVertDistSlider.setValue(50);
+        nodeVertDistSlider.setValue(40);
         nodeVertDistSlider.setMaximum(150);
         nodeVertDistSlider.addChangeListener(new ChangeListener() {
             @Override
@@ -182,7 +232,7 @@ public class AnimationPanel extends JPanel {
         });
         add(nodeVertDistSlider);
 
-        nodeMinHorizDistLabel = new JLabel("nodeMinHorizDist: " + nodeMinHorizDist);
+        nodeMinHorizDistLabel = new JLabel("horiz dist: " + nodeMinHorizDist);
         add(nodeMinHorizDistLabel);
 
         nodeMinHorizDistSlider = new JSlider();
@@ -196,7 +246,7 @@ public class AnimationPanel extends JPanel {
         });
         add(nodeMinHorizDistSlider);
 
-        showNodeIDCheckbox = new JCheckBox("node-IDs");
+        showNodeIDCheckbox = new JCheckBox("IDs");
         showNodeIDCheckbox.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -207,19 +257,19 @@ public class AnimationPanel extends JPanel {
         });
         add(showNodeIDCheckbox);
 
-        showHelplinesCheckbox = new JCheckBox("helplines");
-        showHelplinesCheckbox.setEnabled(false);
-        showHelplinesCheckbox.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (showHelplinesCheckbox.isEnabled()) {
-                    setShowHelplines();
-                } else {
-                    JOptionPane.showMessageDialog(null, "helplines can only be displayed in the animation-mode 'nodewise'", "only in nodewise animation", JOptionPane.PLAIN_MESSAGE);
-                }
-            }
-        });
-        add(showHelplinesCheckbox);
+//        showHelplinesCheckbox = new JCheckBox("helplines");
+//        showHelplinesCheckbox.setEnabled(false);
+//        showHelplinesCheckbox.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseReleased(MouseEvent e) {
+//                if (showHelplinesCheckbox.isEnabled()) {
+//                    setShowHelplines();
+//                } else {
+//                    JOptionPane.showMessageDialog(null, "helplines can only be displayed in the animation-mode 'nodewise'", "only in nodewise animation", JOptionPane.PLAIN_MESSAGE);
+//                }
+//            }
+//        });
+//        add(showHelplinesCheckbox);
     }
 
 
@@ -238,7 +288,7 @@ public class AnimationPanel extends JPanel {
     }
 
     private void changeAnimSpeed() {
-        animator.setSpeed(animSpeedSlider.getValue());
+        animator.setSpeed(60 - animSpeedSlider.getValue());
     }
 
 
@@ -246,9 +296,9 @@ public class AnimationPanel extends JPanel {
         graphPanel.setShowNodeID(showNodeIDCheckbox.isSelected());
     }
 
-    private void setShowHelplines() {
-        graphPanel.setShowHelplines(showHelplinesCheckbox.isSelected());
-    }
+//    private void setShowHelplines() {
+//        graphPanel.setShowHelplines(showHelplinesCheckbox.isSelected());
+//    }
 
     private void togglePauseContinue() {
         if (animator.isPaused()) {
@@ -261,14 +311,10 @@ public class AnimationPanel extends JPanel {
     }
 
     private void setAnimIndex(int index) {
-        if (index == 3) {
-            showHelplinesCheckbox.setEnabled(true);
-        } else {
-            showHelplinesCheckbox.setEnabled(false);
-        }
-
         animIndex = index;
         graphPanel.setAnimIndex(index);
+        model.setAnimIndex(index);
+        graphPanel.setTimeline(model.getTimeline());
     }
 
     public void enableSwitch(boolean onoff) {

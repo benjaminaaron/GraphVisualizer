@@ -21,18 +21,18 @@ public class ControlPanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     private JLabel layoutLabel, animLabel, orderLabel; //graphLabel
-    private JButton newButton, sampleButton, importButton, exportButton, helpButton, consoleShowButton;
+    private JButton newButton, sampleButton, sample2Button, importButton, exportButton, helpButton, consoleShowButton;
     private JRadioButton basicLayout, treeLayout, radialPlainLayout, radialSmartLayout, randomLayout, chronoOrder, leftOrder, rightOrder, middleFullOrder, middleEmptyOrder;
 
     private Model model;
     private Animator animator;
     private GraphPanel graphPanel;
 
-    private LayoutInterface layoutAlgorithm = new RadialPlainLayout();
+    private LayoutInterface layoutAlgorithm = new TreeLayout();
     private int horizOrderIndex = 0;
 
     private int nodeSize = 20;
-    private int nodeVertDist = 50;
+    private int nodeVertDist = 40;
     private int nodeMinHorizDist = 30;
 
 
@@ -79,16 +79,31 @@ public class ControlPanel extends JPanel {
         });
         add(newButton);
 
-        sampleButton = new JButton("sample");
+        sampleButton = new JButton("sample 1");
         sampleButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (sampleButton.isEnabled()) {
-                    initSampleGraph();
+                    treeLayout.setSelected(true);
+                    setLayoutAlgorithm(1, new TreeLayout());
+                    initSampleGraph(1);
                 }
             }
         });
         add(sampleButton);
+
+        sample2Button = new JButton("sample 2");
+        sample2Button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (sample2Button.isEnabled()) {
+                    radialPlainLayout.setSelected(true);
+                    setLayoutAlgorithm(2, new RadialPlainLayout());
+                    initSampleGraph(2);
+                }
+            }
+        });
+        add(sample2Button);
 
         importButton = new JButton("import");
         importButton.addMouseListener(new MouseAdapter() {
@@ -120,6 +135,7 @@ public class ControlPanel extends JPanel {
             }
         });
         treeLayout = new JRadioButton("tree");
+        treeLayout.setSelected(true);
         treeLayout.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -129,7 +145,6 @@ public class ControlPanel extends JPanel {
             }
         });
         radialPlainLayout = new JRadioButton("radial plain");
-        radialPlainLayout.setSelected(true);
         radialPlainLayout.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -158,13 +173,13 @@ public class ControlPanel extends JPanel {
         });
         layoutGroup.add(basicLayout);
         layoutGroup.add(treeLayout);
-        layoutGroup.add(radialPlainLayout);
+        //layoutGroup.add(radialPlainLayout);
         layoutGroup.add(radialSmartLayout);
         layoutGroup.add(randomLayout);
         add(basicLayout);
         add(treeLayout);
         add(radialPlainLayout);
-        add(radialSmartLayout);
+        //add(radialSmartLayout);
         add(randomLayout);
 
 
@@ -277,6 +292,7 @@ public class ControlPanel extends JPanel {
     }
 
 
+
     private void consoleShow() {
         String data = model.getGraph().consoleShow();
         System.out.println(data);
@@ -287,11 +303,13 @@ public class ControlPanel extends JPanel {
         model.initNewGraph();
         Frame initKeyframe = new Frame();
         initKeyframe.addPoint(new Point("node_rootnode", 0, 0));
-        graphPanel.setTimeline(new Timeline(initKeyframe, null, null, null));
+        Timeline blankTimeline = new Timeline();
+        blankTimeline.addKeyframe(initKeyframe);
+        graphPanel.setTimeline(blankTimeline);
     }
 
-    public void initSampleGraph() {
-        model.initSampleGraph();
+    public void initSampleGraph(int index) {
+        model.initSampleGraph(index);
         graphPanel.setTimeline(model.getTimeline());
     }
 

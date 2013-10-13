@@ -28,7 +28,7 @@ public class GraphPanel extends JPanel {
     private AnimationPanel animationPanel;
 
     private int xOffset = 650;
-    private int yOffset = 200;//80;
+    private int yOffset = 80;
 
     private int nodeSize;
     private int nodeVertDist;
@@ -164,17 +164,15 @@ public class GraphPanel extends JPanel {
 
     public void setAnimIndex(int index) {
         animIndex = index;
-        if (timeline != null) {
-            showTimeline();
-        }
     }
 
     private void showTimeline() {
-        if (animIndex == 0 || timeline.keyframesNodewise == null) {
-            currentFrame = timeline.singleFinalKeyframe;
+        if (animIndex == 0) {
+            currentFrame = timeline.getKeyframes().get(0);
             repaint();
-        } else {
-            ArrayList<Frame> frames = timeline.placeStepsBtwnKeyframes(animIndex, animStepsBtwnKeyframes);
+        }
+        else{
+            ArrayList<Frame> frames = timeline.placeStepsBtwnKeyframes(animStepsBtwnKeyframes);
             System.out.println("size of frames: " + frames.size());
             animationPanel.enableSwitch(false);
             animator.setFrames(frames);
@@ -238,13 +236,13 @@ public class GraphPanel extends JPanel {
         }
 
 
-        if (showHelplines) {
-            g2d.setColor(Color.RED);
-            g2d.setStroke(new BasicStroke(3));
-            for (Line helpline : currentFrame.helplines) {
-                g2d.drawLine((int) helpline.source.x + xOffset, (int) helpline.source.y + yOffset, (int) helpline.target.x + xOffset, (int) helpline.target.y + yOffset);
-            }
-        }
+//        if (showHelplines) {
+//            g2d.setColor(Color.RED);
+//            g2d.setStroke(new BasicStroke(3));
+//            for (Line helpline : currentFrame.helplines) {
+//                g2d.drawLine((int) helpline.source.x + xOffset, (int) helpline.source.y + yOffset, (int) helpline.target.x + xOffset, (int) helpline.target.y + yOffset);
+//            }
+//        }
     }
 
     public void setShowNodeID(boolean onoff) {
@@ -252,13 +250,13 @@ public class GraphPanel extends JPanel {
         repaint();
     }
 
-    public void setShowHelplines(boolean onoff) {
-        showHelplines = onoff;
-        if (timeline != null) {
-            showTimeline();
-        }
-        System.out.println("showing helplines: " + showHelplines);
-    }
+//    public void setShowHelplines(boolean onoff) {
+//        showHelplines = onoff;
+//        if (timeline != null) {
+//            showTimeline();
+//        }
+//        System.out.println("showing helplines: " + showHelplines);
+//    }
 }
 
 

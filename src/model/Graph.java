@@ -10,76 +10,25 @@ public class Graph {
     private ArrayList<Edge> edges = new ArrayList<>();
     private Node rootnode;
     private int maxVertical = 0;
-    private ArrayList<Node> forAllAttached = new ArrayList<>();
+    private int maxHorizontal = 0;
+    private ArrayList<Node> forCollectingAttached = new ArrayList<>();
 
-    private Frame[] keyframesTwo = new Frame[2];
-    private ArrayList<Frame> keyframesLevelwise = new ArrayList<>();
-    private ArrayList<Frame> keyframesNodewise = new ArrayList<>();
+    private Timeline timeline;
 
 
-    public Graph() {
+    public Graph() {}
+
+    public void setTimeline(Timeline timeline){
+        this.timeline = timeline;
+    }
+
+    public Timeline getTimeline(){
+        return timeline;
     }
 
     public Graph(ArrayList<Node> nodes, ArrayList<Edge> edges) {
         this.nodes = nodes;
         this.edges = edges;
-    }
-
-    public void setFirstKeyframe() {
-        addKeyframeLevelwiseAndNodewise();
-    }
-
-    public void setFirstKeyframeTwo() {
-        keyframesTwo[0] = takeKeyframeNow();
-    }
-
-    public void nodeSetPos(Node node, double x, double y) {
-        node.setPos(x, y);
-        if (node != rootnode) //otherwise that feels like "lagging" when there is an anim-step for the rootnode-placement on 0,0 because it IS already on 0,0
-        {
-            keyframesNodewise.add(takeKeyframeNow());
-        }
-    }
-
-    public void addHelplinesKeyframe(ArrayList<Line> helplines) {
-        Frame helplineKeyframe = takeKeyframeNow();
-        for (Line helpline : helplines) {
-            helplineKeyframe.addHelpline(helpline);
-        }
-        keyframesNodewise.add(helplineKeyframe);
-    }
-
-    public void addKeyframeLevelwise() {
-        keyframesLevelwise.add(takeKeyframeNow());
-    }
-
-    public void addKeyframeLevelwiseAndNodewise() {
-        Frame now = takeKeyframeNow();
-        keyframesLevelwise.add(now);
-        keyframesNodewise.add(now);
-    }
-
-    private Frame takeKeyframeNow() {
-        Frame keyframe = new Frame();
-        for (Node node : nodes) {
-            keyframe.addPoint(node.getPoint());
-        }
-        for (Edge edge : edges) {
-            keyframe.addLine(edge.getLine());
-        }
-        return keyframe;
-    }
-
-    public Timeline getTimeline() {
-        System.out.println("Graph class delivered snapshotsFine with size: " + keyframesNodewise.size());
-        keyframesTwo[1] = takeKeyframeNow();
-        addKeyframeLevelwise();
-        return new Timeline(takeKeyframeNow(), keyframesTwo, keyframesLevelwise, keyframesNodewise);
-    }
-
-    public void clearTimeline() {
-        keyframesLevelwise.clear();
-        keyframesNodewise.clear();
     }
 
     public void resetNodesPos() {
@@ -97,13 +46,15 @@ public class Graph {
         return null;
     }
 
-    public void addChildToThisParent(String clickedNodeID) {
+    public String addChildToThisParent(String clickedNodeID) {
         Node clickedNode = findNodeByID(clickedNodeID);
         Node nodeAdded = new Node("", "");
         System.out.println("added node " + nodeAdded.getValue());
         nodeAdded.setPos(clickedNode.getX(), clickedNode.getY());
         nodes.add(nodeAdded);
         edges.add(new Edge(clickedNode, nodeAdded));
+
+        return nodeAdded.getID();
     }
 
 
@@ -187,10 +138,13 @@ public class Graph {
             nodesLevels.add(level);
             level = nextLevel;
             nextLevel = new ArrayList<>();
+            if(horizontal > maxHorizontal)
+                maxHorizontal = horizontal;
             horizontal = 1;
             vertical++;
         }
         maxVertical = nodesLevels.size() - 1;
+        maxHorizontal -= 1;
 
         //total Children
         for (int i = maxVertical; i >= 0; i--) {
@@ -260,10 +214,10 @@ public class Graph {
     public void deleteNode(String clickedNodeID) {
         Node candidate = findNodeByID(clickedNodeID);
         if (candidate != rootnode) {
-            forAllAttached.clear();
-            forAllAttached.add(candidate);
+            forCollectingAttached.clear();
+            forCollectingAttached.add(candidate);
             getAllAttached(candidate.getChildren());
-            for (Node node : forAllAttached) {
+            for (Node node : forCollectingAttached) {
                 ArrayList<Edge> bin = new ArrayList<>();
                 for (Edge edge : edges) {
                     if (edge.getSource() == node || edge.getTarget() == node) {
@@ -282,7 +236,7 @@ public class Graph {
     private void getAllAttached(ArrayList<Node> children) {
         if (children.size() > 0) {
             for (Node child : children) {
-                forAllAttached.add(child);
+                forCollectingAttached.add(child);
                 getAllAttached(child.getChildren());
             }
         }
@@ -300,8 +254,21 @@ public class Graph {
         return nodesLevels;
     }
 
+    public ArrayList<Node> getNodesAtSpecificHorizontalnumber(int horizontal){
+        ArrayList<Node> collect = new ArrayList<>();
+        for(Node node : nodes)
+            if(node.getHorizontal() == horizontal)
+                collect.add(node);
+        return collect;
+    }
+
+
     public int getMaxVertical() {
         return maxVertical;
+    }
+
+    public int getMaxHorizontal(){
+        return maxHorizontal;
     }
 
     public Node getRootnode() {
@@ -309,14 +276,80 @@ public class Graph {
     }
 
     public ArrayList<Node> getAllNodesAttachedToThisNode(Node ancestor) {
-        forAllAttached.clear();
-        forAllAttached.add(ancestor);
+        forCollectingAttached.clear();
+        forCollectingAttached.add(ancestor);
         getAllAttached(ancestor.getChildren());
-        return forAllAttached;
+        return forCollectingAttached;
     }
 
-
 }
+
+
+
+// old keyframe-handling, is now happening in AnimationProduction
+
+//private Frame[] keyframesTwo = new Frame[2];
+//private ArrayList<Frame> keyframesLevelwise = new ArrayList<>();
+//private ArrayList<Frame> keyframesNodewise = new ArrayList<>();
+
+/*public void setFirstKeyframe() {
+    addKeyframeLevelwiseAndNodewise();
+}
+
+    public void setFirstKeyframeTwo() {
+        keyframesTwo[0] = takeKeyframeNow();
+    }
+
+    public void nodeSetPos(Node node, double x, double y) {
+        node.setPos(x, y);
+        if (node != rootnode) //otherwise that feels like "lagging" when there is an anim-step for the rootnode-placement on 0,0 because it IS already on 0,0
+        {
+            keyframesNodewise.add(takeKeyframeNow());
+        }
+    }
+
+    public void addHelplinesKeyframe(ArrayList<Line> helplines) {
+        Frame helplineKeyframe = takeKeyframeNow();
+        for (Line helpline : helplines) {
+            helplineKeyframe.addHelpline(helpline);
+        }
+        keyframesNodewise.add(helplineKeyframe);
+    }
+
+    public void addKeyframeLevelwise() {
+        keyframesLevelwise.add(takeKeyframeNow());
+    }
+
+    public void addKeyframeLevelwiseAndNodewise() {
+        Frame now = takeKeyframeNow();
+        keyframesLevelwise.add(now);
+        keyframesNodewise.add(now);
+    }
+
+    private Frame takeKeyframeNow() {
+        Frame keyframe = new Frame();
+        for (Node node : nodes) {
+            keyframe.addPoint(node.getPoint());
+        }
+        for (Edge edge : edges) {
+            keyframe.addLine(edge.getLine());
+        }
+        return keyframe;
+    }
+
+    public Timeline getTimeline() {
+        System.out.println("Graph class delivered snapshotsFine with size: " + keyframesNodewise.size());
+        keyframesTwo[1] = takeKeyframeNow();
+        addKeyframeLevelwise();
+        return new Timeline(takeKeyframeNow(), keyframesTwo, keyframesLevelwise, keyframesNodewise);
+    }
+
+    public void clearTimeline() {
+        keyframesLevelwise.clear();
+        keyframesNodewise.clear();
+    }*/
+
+
 
 
 //public Graph(Graph graph){ //plain copy, needs to be expanded again

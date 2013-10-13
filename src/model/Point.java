@@ -12,6 +12,15 @@ public class Point {
         this.y = y;
     }
 
+    public void setPos(double x, double y){
+        this.x = x;
+        this.y = y;
+    }
+
+    public boolean isSamePoint(Point toCheck){
+        return toCheck.nodeID.equals(nodeID) && (toCheck.x == x) && (toCheck.y == y);
+    }
+
     public Point(Point point) {
         this.nodeID = point.nodeID;
         this.x = point.x;

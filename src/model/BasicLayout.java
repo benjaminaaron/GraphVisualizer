@@ -17,12 +17,11 @@ public class BasicLayout implements LayoutInterface {
             double x = -xWidth / 2;
 
             for (Node node : horizontal) {
-                graph.nodeSetPos(node, x, y);
+                node.setPos(x, y);
                 x += nodeSize + nodeMinHorizDist;
             }
             vertical--;
             horizontal = graph.getNodesAtLevel(vertical);
-            graph.addKeyframeLevelwise(); //encapsulating better? problem with treeLayout pulling getNodesAtLevel twice per loop
         }
         return graph;
     }

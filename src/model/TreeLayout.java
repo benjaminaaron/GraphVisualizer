@@ -9,8 +9,7 @@ public class TreeLayout implements LayoutInterface {
     private int nodeMinHorizDist;
     private int nodeVertDist;
 
-    public TreeLayout() {
-    }
+    public TreeLayout() {}
 
     @Override
     public Graph performLayout(Graph graph, int nodeSize, int nodeMinHorizDist, int nodeVertDist) {
@@ -28,10 +27,9 @@ public class TreeLayout implements LayoutInterface {
         double blockWidth = currentLOWERLevelNodes.size() * nodeSize + (currentLOWERLevelNodes.size() - 1) * nodeMinHorizDist - nodeSize;
         double x = -blockWidth / 2;
         for (Node node : currentLOWERLevelNodes) {
-            graph.nodeSetPos(node, x, bottomY);
+            node.setPos(x, bottomY);
             x += nodeSize + nodeMinHorizDist;
         }
-        graph.addKeyframeLevelwise();
 
         ArrayList<Node> currentUPPERLevelNodes = new ArrayList<>();
         currentUPPERLevelNodes = graph.getNodesAtLevel(lowLevelVertical - 1);
@@ -55,13 +53,13 @@ public class TreeLayout implements LayoutInterface {
             for (Node parent : parents) {
                 double firstChildX = parent.getChildren().get(0).getX();
                 if (parent.getChildren().size() == 1) {
-                    graph.nodeSetPos(parent, firstChildX, upperY);
+                    parent.setPos(firstChildX, upperY);
                 } else {
                     double lastChildX = parent.getChildren().get(parent.getChildren().size() - 1).getX();
                     double childrenBlockBorderLEFT = firstChildX - nodeSize / 2;
                     double childrenBlockBorderRIGHT = lastChildX + nodeSize / 2;
                     double childrenBlockMIDDLE = childrenBlockBorderLEFT + (childrenBlockBorderRIGHT - childrenBlockBorderLEFT) / 2;
-                    graph.nodeSetPos(parent, childrenBlockMIDDLE, upperY);
+                    parent.setPos(childrenBlockMIDDLE, upperY);
                 }
             }
 
@@ -76,10 +74,11 @@ public class TreeLayout implements LayoutInterface {
                 int nodesBtwn = checkRight.getHorizontal() - checkLeft.getHorizontal() - 1;
                 double requiredGap = nodesBtwn * nodeSize + (nodesBtwn + 1) * nodeMinHorizDist;
 
-                Line line = new Line(new Point(checkLeft.getPoint()), new Point(checkRight.getPoint()));
+/*                Line line = new Line(new Point(checkLeft.getPoint()), new Point(checkRight.getPoint()));
                 ArrayList<Line> helplines = new ArrayList<>();
                 helplines.add(line);
                 graph.addHelplinesKeyframe(helplines);
+*/
 
 
                 System.out.println("isGap: " + isGap + "  requiredGap: " + requiredGap);
@@ -89,7 +88,7 @@ public class TreeLayout implements LayoutInterface {
                     moving(checkLeft, -gapDiff / 2);
                     moving(checkRight, gapDiff / 2);
 
-                    Line line1 = new Line(new Point(checkLeft.getPoint()), new Point(checkRight.getPoint()));
+/*                    Line line1 = new Line(new Point(checkLeft.getPoint()), new Point(checkRight.getPoint()));
                     Line arrowLeftUpwards = new Line(line1.source, new Point("", line1.source.x + 5, line1.source.y - 5));
                     Line arrowLeftDownwards = new Line(line1.source, new Point("", line1.source.x + 5, line1.source.y + 5));
                     Line arrowRightUpwards = new Line(line1.target, new Point("", line1.target.x - 5, line1.target.y - 5));
@@ -101,7 +100,7 @@ public class TreeLayout implements LayoutInterface {
                     helplines.add(arrowRightUpwards);
                     helplines.add(arrowRightDownwards);
                     graph.addHelplinesKeyframe(helplines);
-
+ */
                     gapBiggerThanMin.add(false);
                 } else {
                     gapBiggerThanMin.add(true);
@@ -117,7 +116,7 @@ public class TreeLayout implements LayoutInterface {
             int leftestPlacedNodeIndex = firstFixedNode.getHorizontal() - 1;
             if (leftestPlacedNodeIndex != 0) {
                 for (int i = 0; i < leftestPlacedNodeIndex; i++) {
-                    graph.nodeSetPos(currentUPPERLevelNodes.get(i), firstFixedNode.getX() - (nodeMinHorizDist + nodeSize) * (leftestPlacedNodeIndex - i), upperY);
+                    currentUPPERLevelNodes.get(i).setPos(firstFixedNode.getX() - (nodeMinHorizDist + nodeSize) * (leftestPlacedNodeIndex - i), upperY);
                 }
             }
 
@@ -148,9 +147,9 @@ public class TreeLayout implements LayoutInterface {
                         } else {
                             nodesRemaining--;
                             if (leafParentAsPREVIOUSFixedNode) {
-                                graph.nodeSetPos(leaf, previousFixedNode.getX() + (nodeSize + nodeMinHorizDist) * (nodesBtwn.size() - nodesRemaining), upperY);
+                                leaf.setPos(previousFixedNode.getX() + (nodeSize + nodeMinHorizDist) * (nodesBtwn.size() - nodesRemaining), upperY);
                             } else if (leafParentAsNEXTfixedNode) {
-                                graph.nodeSetPos(leaf, nextFixedNode.getX() - (nodeSize + nodeMinHorizDist) * (nodesRemaining + 1), upperY);
+                                leaf.setPos(nextFixedNode.getX() - (nodeSize + nodeMinHorizDist) * (nodesRemaining + 1), upperY);
                             } else {
                                 centered.add(leaf);
                             }
@@ -180,7 +179,7 @@ public class TreeLayout implements LayoutInterface {
                     int count = 0;
                     for (Node centerLeaf : centered) {
                         double newX = startLeft + deltaPlacement * count;
-                        graph.nodeSetPos(centerLeaf, newX, upperY);
+                        centerLeaf.setPos(newX, upperY);
                         count++;
                     }
                 } else { //just do minimal placement then
@@ -188,7 +187,7 @@ public class TreeLayout implements LayoutInterface {
                     int count = 1;
                     for (Node node : nodesBtwn) {
                         double newX = previousFixedNode.getX() + count * (nodeMinHorizDist + nodeSize);
-                        graph.nodeSetPos(node, newX, upperY);
+                        node.setPos(newX, upperY);
                         count++;
                     }
                 }
@@ -201,7 +200,7 @@ public class TreeLayout implements LayoutInterface {
             if (rightestPlacedNodeIndex != currentUPPERLevelNodes.size() - 1) {
                 int count = 1;
                 for (int j = rightestPlacedNodeIndex + 1; j < currentUPPERLevelNodes.size(); j++) {
-                    graph.nodeSetPos(currentUPPERLevelNodes.get(j), lastFixedNode.getX() + (nodeMinHorizDist + nodeSize) * count, upperY);
+                    currentUPPERLevelNodes.get(j).setPos(lastFixedNode.getX() + (nodeMinHorizDist + nodeSize) * count, upperY);
                     count++;
                 }
             }
@@ -210,17 +209,13 @@ public class TreeLayout implements LayoutInterface {
             currentLOWERLevelNodes = graph.getNodesAtLevel(lowLevelVertical);
             currentUPPERLevelNodes = graph.getNodesAtLevel(lowLevelVertical - 1);
             upperY = (lowLevelVertical - 1) * (nodeVertDist + nodeSize);
-            graph.addKeyframeLevelwise();
         }
 
         //moveAllToCenterRootnode
         double dist = graph.getRootnode().getX();
         if (dist != 0) {
             for (Node node : graph.getNodes()) //exclude this from keyframeNodewise?
-            {
                 node.setPos(node.getX() - dist, node.getY());
-            }
-            graph.addKeyframeLevelwiseAndNodewise();
         }
 
         return graph;

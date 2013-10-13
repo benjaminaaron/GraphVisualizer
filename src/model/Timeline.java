@@ -2,37 +2,36 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Timeline {
 
-    public Frame singleFinalKeyframe;
-    public Frame[] keyframesTwo;
-    public ArrayList<Frame> keyframesLevelwise;
-    public ArrayList<Frame> keyframesNodewise;
+    private ArrayList<Frame> keyframes = new ArrayList<>();
 
+    public Timeline() {}
 
-    public Timeline(Frame singleFinalKeyframe, Frame[] keyframesTwo, ArrayList<Frame> keyframesLevelwise, ArrayList<Frame> keyframesNodewise) {
-        this.singleFinalKeyframe = singleFinalKeyframe;
-        this.keyframesTwo = keyframesTwo;
-        this.keyframesLevelwise = keyframesLevelwise;
-        this.keyframesNodewise = keyframesNodewise;
+    public void addKeyframe(Frame keyframe){
+        keyframes.add(keyframe);
     }
 
-    public ArrayList<Frame> placeStepsBtwnKeyframes(int animIndex, int steps) {
+    public ArrayList<Frame> getKeyframes(){
+        return keyframes;
+    }
 
-        ArrayList<Frame> keyframes = new ArrayList<>();
-        if (animIndex == 1) {
-            keyframes.add(keyframesTwo[0]);
-            keyframes.add(keyframesTwo[1]);
-        }
-        if (animIndex == 2) {
-            keyframes = keyframesLevelwise;
-        }
-        if (animIndex == 3) {
-            keyframes = keyframesNodewise;
+    public ArrayList<Frame> placeStepsBtwnKeyframes(int steps) {
+        if(keyframes.size() < 2){
+            Frame emptyFrame = new Frame(keyframes.get(0));
+            for(Point point : emptyFrame.points)
+                point.setPos(0, 0);
+            for(Line line : emptyFrame.lines){
+                line.source.setPos(0, 0);
+                line.target.setPos(0, 0);
+            }
+            keyframes.add(0, emptyFrame);
         }
 
-        System.out.println("placeStepsBtwnKeyframes is working with keyframes of size: " + keyframes.size());
+        System.out.println("placeStepsBtwnKeyframes runs with keyframes of size: " + keyframes.size());
 
         ArrayList<Frame> extended = new ArrayList<>();
 
@@ -41,12 +40,12 @@ public class Timeline {
             extended.add(fromKeyframe);
             Frame toKeyframe = keyframes.get(i + 1);
 
-            if (toKeyframe.helplines.size() != 0) {
-                for (Line helpline : toKeyframe.helplines) {
-                    fromKeyframe.addHelpline(new Line(helpline));
-                }
-                toKeyframe.helplines.clear();
-            }
+//            if (toKeyframe.helplines.size() != 0) {
+//                for (Line helpline : toKeyframe.helplines) {
+//                    fromKeyframe.addHelpline(new Line(helpline));
+//                }
+//                toKeyframe.helplines.clear();
+//            }
 
             //save deltas here in Timeline, not encapsulating in points/lines/frames because it's unnecessary ballast, not elegant to carry the no-longer-needed deltas along into the view-package
 
@@ -88,11 +87,39 @@ public class Timeline {
             }
 
         }
-        extended.add(new Frame(keyframes.get(keyframes.size() - 1)));
+        extended.add(new Frame(keyframes.get(keyframes.size() - 1))); //the final one
+        //singleFinalKeyframe = keyframes.get(keyframes.size() - 1);  // maybe?
 
         System.out.println("returning extended with size: " + extended.size());
         return extended;
     }
 
-
 }
+
+
+
+//    public void setupForShortAnim(){
+//        if(keyframes.size() == 0){
+//            Frame newStartFrame = new Frame();
+//            for(Point point : newStartFrame.points)
+//                newStartFrame.addPoint(new Point(point.nodeID, 0, 0));
+//            for(Line line : newStartFrame.lines)
+//                newStartFrame.addLine(new Line(new Point(line.getSource().nodeID, 0, 0), new Point(line.getTarget().nodeID, 0 , 0)));
+//
+//            keyframes.add(newStartFrame);
+//        }
+//    }
+
+//old setupForShortAnim; now in Model and stored in Graph...
+//        else{
+//            Map<String, Point> lastFinalKeyframeHashmap = new HashMap<>();
+//            for(Point point : lastFinalKeyframe.points)
+//                lastFinalKeyframeHashmap.put(point.nodeID, point);
+//
+//            Frame finalKeyframeCOPY = new Frame(finalKeyframe);
+//            for(Point point : finalKeyframeCOPY.points)
+//                if(lastFinalKeyframeHashmap.containsKey(point.nodeID))
+//                    point.setPos(lastFinalKeyframeHashmap.get(point.nodeID).x, lastFinalKeyframeHashmap.get(point.nodeID).y);
+//
+//            keyframes.add(finalKeyframeCOPY);
+//        }
