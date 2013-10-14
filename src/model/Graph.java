@@ -58,7 +58,7 @@ public class Graph {
         return nodeAdded.getID();
     }
 
-    public void addChildToThisParentNextToThisSibling(String clickedNodeID, String closestNodeToReleaseID, boolean rightFromThis) {
+/*    public void addChildToThisParentNextToThisSibling(String clickedNodeID, String closestNodeToReleaseID, boolean rightFromThis) {
         Node clickedNode = findNodeByID(clickedNodeID);
         Node closestNodeToRelease = findNodeByID(closestNodeToReleaseID);
 
@@ -86,6 +86,7 @@ public class Graph {
             addChildToThisParent(clickedNodeID);
         }
     }
+*/
 
     public void addNode(Node node) {
         nodes.add(node);

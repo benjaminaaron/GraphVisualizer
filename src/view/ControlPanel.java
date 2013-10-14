@@ -256,11 +256,11 @@ public class ControlPanel extends JPanel {
         graphPanel.setTimeline(model.getTimeline());
     }
 
-    public void handleNodeClicked(String clickedNodeID, String closestNodeToRelease, boolean rightFromThis) {
-//TODO needs reworking as mentioned in the model method
-//        model.handleNodeClicked(clickedNodeID, closestNodeToRelease, rightFromThis);
-//        graphPanel.setTimeline(model.getTimeline());
+/*    public void handleNodeClicked(String clickedNodeID, String closestNodeToRelease, boolean rightFromThis) {
+        model.handleNodeClicked(clickedNodeID, closestNodeToRelease, rightFromThis);
+        graphPanel.setTimeline(model.getTimeline());
     }
+*/
 
     private void setLayoutAlgorithm(int index, LayoutInterface layoutAlgorithm) {
         this.layoutAlgorithm = layoutAlgorithm;

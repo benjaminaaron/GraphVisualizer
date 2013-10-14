@@ -111,13 +111,14 @@ public class GraphPanel extends JPanel {
         if (animator.isIdle() && currentFrame != null) {
 
             Point clickedPoint = coordsAreOnPoint(clickX, clickY);
-            Point releasedPoint = coordsAreOnPoint(releaseX, releaseY);
 
+            //DEACTIVATING THAT FEATURE FOR NOW, will implement it better soon
+
+/*
+            Point releasedPoint = coordsAreOnPoint(releaseX, releaseY);
             Point closestPointToRelease = null;
             double closest = 1000;
             boolean rightFromThis = true;
-
-            //jesus... what's all the mess in the rest of this method from here downwards?? i am sure that can be simplified :)
 
             if (clickedPoint != null && clickedPoint != releasedPoint) {
                 for (Point point : currentFrame.points) {
@@ -131,8 +132,11 @@ public class GraphPanel extends JPanel {
                     }
                 }
             }
+*/
+            if(clickedPoint != null)
+                controlPanel.handleNodeClicked(clickedPoint.nodeID, leftButton);
 
-            if (clickedPoint != null) {
+/*            if (clickedPoint != null) {
                 if (clickedPoint == releasedPoint)
                     controlPanel.handleNodeClicked(clickedPoint.nodeID, leftButton);
                 else
@@ -146,6 +150,7 @@ public class GraphPanel extends JPanel {
                         }
                     }
             }
+*/
         }
     }
 

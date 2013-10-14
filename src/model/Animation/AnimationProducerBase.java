@@ -19,10 +19,10 @@ public abstract class AnimationProducerBase implements AnimationProducer {
         this.graph = graph;
     }
 
-
     // HELP METHODS
 
-    protected void reset(){
+    @Override
+    public void reset(){
         timeline = new Timeline();
         points.clear();
         lines.clear();
