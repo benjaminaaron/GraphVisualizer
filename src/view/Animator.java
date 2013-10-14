@@ -72,13 +72,6 @@ public class Animator extends Thread {
     }
 
     /**
-     * needed to stop the animation when switching to none-anim mode
-     */
-    public synchronized void cancel(){
-        currentAnimationStep = frames.size() - 1;
-    }
-
-    /**
      * Immediately jumps to the last frame and finishes the animation.
      */
     public synchronized void finish() {
