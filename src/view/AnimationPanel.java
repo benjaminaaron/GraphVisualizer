@@ -58,8 +58,6 @@ public class AnimationPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 switch ((String) animComboBox.getSelectedItem()) {
                     case "none":
-                        animator.finish();
-                        animator.proceed();
                         setAnimationAlgorithm(new SingleFinalFrame());
                         break;
                     case "short":
