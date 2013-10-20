@@ -5,3 +5,5 @@
 .project
 .idea/
 *.iml
+.out/
+ignorecase = false
