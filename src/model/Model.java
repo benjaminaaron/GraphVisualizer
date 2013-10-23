@@ -12,7 +12,7 @@ public class Model {
 
     private Graph graph;
     private int horizOrderIndex = 0;
-    private int animIndex = 1;
+    private int frameSteps = 15;
     private LayoutManager layoutManager;
     private AnimationProducer animationAlgorithm = new Short();
 
@@ -28,7 +28,7 @@ public class Model {
         layoutManager.changeNodeParams(nodeSize, nodeVertDist, nodeMinHorizDist);
         graph = layoutManager.performLayout(graph);
         animationAlgorithm.setGraph(graph);
-        graph.setTimeline(animationAlgorithm.produceTimeline());
+        graph.setTimeline(animationAlgorithm.produceTimeline(frameSteps));
         System.out.println("new node paramameters applied");
     }
 
@@ -36,7 +36,7 @@ public class Model {
         layoutManager.setLayoutAlgorithm(layoutAlgorithm);
         graph = layoutManager.performLayout(graph);
         animationAlgorithm.setGraph(graph);
-        graph.setTimeline(animationAlgorithm.produceTimeline());
+        graph.setTimeline(animationAlgorithm.produceTimeline(frameSteps));
         System.out.println("layout change to layoutAlgorithm: " + layoutAlgorithm);
     }
 
@@ -45,22 +45,23 @@ public class Model {
         graph.expand(horizOrderIndex);
         graph = layoutManager.performLayout(graph);
         animationAlgorithm.setGraph(graph);
-        graph.setTimeline(animationAlgorithm.produceTimeline());
+        graph.setTimeline(animationAlgorithm.produceTimeline(frameSteps));
         System.out.println("order index changed to: " + index);
     }
 
-    public void setAnimationAlgorithm(AnimationProducer animationAlgorithm){
+    public void setAnimationAlgorithm(AnimationProducer animationAlgorithm, int frameSteps){
+        this.frameSteps = frameSteps;
         inShortAnim = animationAlgorithm.getClass().toString().equals("class model.Animation.Short");
         this.animationAlgorithm = animationAlgorithm;
         this.animationAlgorithm.setGraph(graph);
-        graph.setTimeline(this.animationAlgorithm.produceTimeline());
+        graph.setTimeline(this.animationAlgorithm.produceTimeline(frameSteps));
     }
 
     public void initNewGraph() {
         graph = new Graph();
         graph.addNode(new Node("node_rootnode", ""));
         animationAlgorithm.setGraph(graph);
-        graph.setTimeline(animationAlgorithm.produceTimeline());
+        graph.setTimeline(animationAlgorithm.produceTimeline(frameSteps));
         System.out.println("set a new graph with only the rootnode");
     }
 
@@ -70,7 +71,7 @@ public class Model {
         //System.out.println(graph.consoleShow());
         graph = layoutManager.performLayout(graph);
         animationAlgorithm.setGraph(graph);
-        graph.setTimeline(animationAlgorithm.produceTimeline());
+        graph.setTimeline(animationAlgorithm.produceTimeline(frameSteps));
         System.out.println("loaded a sample graph");
     }
 
@@ -79,7 +80,7 @@ public class Model {
         graph.expand(horizOrderIndex);
         graph = layoutManager.performLayout(imported);
         animationAlgorithm.setGraph(graph);
-        graph.setTimeline(animationAlgorithm.produceTimeline());
+        graph.setTimeline(animationAlgorithm.produceTimeline(frameSteps));
         System.out.println("loaded an imported graph");
     }
 
@@ -91,7 +92,7 @@ public class Model {
             //save state for short-Anim
             SingleFinalFrame temp1 = new SingleFinalFrame();
             temp1.setGraph(graph);
-            stateBeforeClick = temp1.produceTimeline().getKeyframes().get(0);
+            stateBeforeClick = temp1.produceTimeline(frameSteps).getFrames().get(0);
         }
 
         String addedNodeID = "";
@@ -120,11 +121,11 @@ public class Model {
             Short temp2 = new Short();
             temp2.setGraph(graph);
             temp2.setPreviousFrame(stateBeforeClick);
-            graph.setTimeline(temp2.produceTimeline());
+            graph.setTimeline(temp2.produceTimeline(frameSteps));
         }
         else{
             animationAlgorithm.setGraph(graph);
-            graph.setTimeline(animationAlgorithm.produceTimeline());
+            graph.setTimeline(animationAlgorithm.produceTimeline(frameSteps));
         }
         //System.out.println(graph.consoleShow());
     }

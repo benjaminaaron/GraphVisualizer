@@ -13,14 +13,14 @@ public class Short extends AnimationProducerBase {
     }
 
     @Override
-    public Timeline produceTimeline() {
+    public Timeline produceTimeline(int frameSteps) {
         reset();
 
         createCurrentState();
         Frame secondFrame = new Frame(points, lines);
 
         if(previousFrame != null)
-            timeline.addKeyframe(previousFrame);
+            keyframes.add(previousFrame);
         else{
             Frame emptyFrame = new Frame(secondFrame);
             for(Point point : emptyFrame.points)
@@ -29,10 +29,10 @@ public class Short extends AnimationProducerBase {
                 line.source.setPos(0, 0);
                 line.target.setPos(0, 0);
             }
-            timeline.addKeyframe(emptyFrame);
+            keyframes.add(emptyFrame);
         }
-        timeline.addKeyframe(secondFrame);
+        keyframes.add(secondFrame);
 
-        return timeline;
+        return new Timeline(fillFramesBtwnKeyframes(frameSteps));
     }
 }

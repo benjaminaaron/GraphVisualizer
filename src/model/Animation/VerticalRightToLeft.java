@@ -8,10 +8,10 @@ import java.util.ArrayList;
 public class VerticalRightToLeft extends AnimationProducerBase {
 
     @Override
-    public Timeline produceTimeline() {
+    public Timeline produceTimeline(int frameSteps) {
         reset();
         createZeroState();
-        timeline.addKeyframe(new Frame(points, lines));
+        keyframes.add(new Frame(points, lines));
         int horizontalnumber = graph.getMaxHorizontal();
         ArrayList<Node> batch = graph.getNodesAtSpecificHorizontalnumber(horizontalnumber);
 
@@ -20,10 +20,10 @@ public class VerticalRightToLeft extends AnimationProducerBase {
         while(batch.size() > 0){
             for(Node node : batch)
                 findPointByNodeID(node.getID()).setPos(node.getX(), node.getY());
-            timeline.addKeyframe(new Frame(points, lines));
+            keyframes.add(new Frame(points, lines));
             horizontalnumber --;
             batch = graph.getNodesAtSpecificHorizontalnumber(horizontalnumber);
         }
-        return timeline;
+        return new Timeline(fillFramesBtwnKeyframes(frameSteps));
     }
 }

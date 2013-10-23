@@ -241,8 +241,7 @@ public class ControlPanel extends JPanel {
         model.initNewGraph();
         Frame initKeyframe = new Frame();
         initKeyframe.addPoint(new Point("node_rootnode", 0, 0));
-        Timeline blankTimeline = new Timeline();
-        blankTimeline.addKeyframe(initKeyframe);
+        Timeline blankTimeline = new Timeline(initKeyframe);
         graphPanel.setTimeline(blankTimeline);
     }
 

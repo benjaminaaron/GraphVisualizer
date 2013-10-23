@@ -37,7 +37,6 @@ public class GraphPanel extends JPanel {
      */
     private Timeline timeline;
     private Frame currentFrame;
-    private int animStepsBtwnKeyframes = 15;
 
     private Point mouseOverPoint = null;
 
@@ -165,12 +164,12 @@ public class GraphPanel extends JPanel {
     }
 
     private void showTimeline() {
-        if (timeline.getKeyframes().size() == 1) {
-            currentFrame = timeline.getKeyframes().get(0);
+        if (timeline.getFrames().size() == 1) {
+            currentFrame = timeline.getFrames().get(0);
             repaint();
         }
         else{
-            ArrayList<Frame> frames = timeline.placeStepsBtwnKeyframes(animStepsBtwnKeyframes);
+            ArrayList<Frame> frames = timeline.getFrames();
             System.out.println("size of frames: " + frames.size());
             animationPanel.enableSwitch(false);
             animator.setFrames(frames);

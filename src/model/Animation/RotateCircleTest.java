@@ -5,10 +5,10 @@ import model.Point;
 
 public class RotateCircleTest extends AnimationProducerBase {
     @Override
-    public Timeline produceTimeline() {
+    public Timeline produceTimeline(int frameSteps) {
         reset();
         createCurrentState();
-        timeline.addKeyframe(new Frame(points, lines));
+        keyframes.add(new Frame(points, lines));
 
         double angleDiff = 360 / points.size();
         double radius = 150;
@@ -30,13 +30,13 @@ public class RotateCircleTest extends AnimationProducerBase {
             }
             else
                 newFrame.timeFactor = 0.1 + (start / 360);
-            timeline.addKeyframe(newFrame);
+            keyframes.add(newFrame);
         }
         setAllPointsOnTheirNodePos();
 
         Frame lastFrame = new Frame(points, lines);
         lastFrame.timeFactor = 4;
-        timeline.addKeyframe(lastFrame);
-        return timeline;
+        keyframes.add(lastFrame);
+        return new Timeline(fillFramesBtwnKeyframes(frameSteps));
     }
 }

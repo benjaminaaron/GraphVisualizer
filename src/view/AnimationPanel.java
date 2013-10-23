@@ -31,6 +31,8 @@ public class AnimationPanel extends JPanel {
     private int nodeVertDist = 40;
     private int nodeMinHorizDist = 30;
 
+    private int frameSteps = 15;
+
     private AnimationProducer animationAlgorithm = new Short();
 
     //index of the current animation-type
@@ -245,7 +247,7 @@ public class AnimationPanel extends JPanel {
     }
 
     private void setAnimationAlgorithm(AnimationProducer animationAlgorithm){
-        model.setAnimationAlgorithm(animationAlgorithm);
+        model.setAnimationAlgorithm(animationAlgorithm, frameSteps);
         graphPanel.setTimeline(model.getTimeline());
     }
 
