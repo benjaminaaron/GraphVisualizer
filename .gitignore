@@ -1,9 +1,0 @@
-/bin
-
-.settings/
-.classpath
-.project
-.idea/
-*.iml
-.out/
-ignorecase = false
